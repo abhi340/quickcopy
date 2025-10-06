@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QuickCopy</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">Loading QuickCopy…</div>
+
+  <!-- Firebase SDK via CDN (modular, tree-shakable) -->
+  <script type="module">
+    // Import Firebase modules from CDN
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged,
+      GoogleAuthProvider,
+      signInWithPopup,
+      sendPasswordResetEmail,
+      deleteUser,
+      updateEmail
+    } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      getDocs,
+      query,
+      where,
+      updateDoc,
+      deleteDoc,
+      doc
+    } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+    // Your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFRfJnHb1ngS1sUnvBjf27a90OpL-DmBI",
+      authDomain: "quickcopy-d4d0f.firebaseapp.com",
+      projectId: "quickcopy-d4d0f",
+      storageBucket: "quickcopy-d4d0f.firebasestorage.app",
+      messagingSenderId: "122284453797",
+      appId: "1:122284453797:web:2de998fedde56fbb7e824c"
+      // measurementId is optional → omitted for modular auth/firestore
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Force re-login on refresh (security)
+    auth.setPersistence('none').catch(console.error);
+
+    // Expose to global scope for index.js
+    window.firebase = {
+      app, auth, db, onAuthStateChanged,
+      signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut,
+      GoogleAuthProvider, signInWithPopup,
+      sendPasswordResetEmail, deleteUser, updateEmail,
+      collection, addDoc, getDocs, query, where, updateDoc, deleteDoc, doc
+    };
+  </script>
+
+  <!-- Your app logic -->
+  <script type="module" src="index.js?v=2"></script>
+</body>
+</html>

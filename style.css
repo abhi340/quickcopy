@@ -1,0 +1,305 @@
+/* ===== Color System ===== */
+:root {
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --secondary: #8b5cf6;
+  --success: #10b981;
+  --danger: #ef4444;
+  --light-bg: #f8fafc;
+  --card: #ffffff;
+  --text: #1e293b;
+  --text-secondary: #64748b;
+  --border: #e2e8f0;
+}
+
+body.dark-mode {
+  --light-bg: #0f172a;
+  --card: #1e293b;
+  --text: #f8fafc;
+  --text-secondary: #94a3b8;
+  --border: #334155;
+}
+
+/* ===== Base ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--light-bg);
+  color: var(--text);
+  padding: 24px;
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+  display: flex;
+  justify-content: center;
+}
+
+#app {
+  width: 100%;
+  max-width: 600px;
+}
+
+h1 {
+  font-weight: 700;
+  font-size: 28px;
+  margin-bottom: 24px;
+}
+
+/* ===== Card & Snippets ===== */
+.card,
+.snippet {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* ===== Header & Profile Dropdown ===== */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.profile-dropdown {
+  position: relative;
+}
+
+.profile-btn {
+  background: none;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--primary);
+  font-size: 20px;
+}
+
+.profile-btn:hover {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  width: 220px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 20px;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 15px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.dropdown-item.danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+}
+
+/* ===== Form & Input ===== */
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text);
+  font-size: 16px;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+/* ===== Buttons ===== */
+.btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.btn.primary {
+  background: var(--primary);
+  color: white;
+}
+.btn.primary:hover {
+  background: var(--primary-dark);
+}
+
+.btn.outline {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+.btn.outline:hover {
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.btn.text {
+  background: none;
+  color: var(--text-secondary);
+  text-align: left;
+  font-size: 14px;
+  padding: 8px 0;
+}
+.btn.text:hover {
+  color: var(--primary);
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.back-btn:hover {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+/* ===== Snippet UI ===== */
+#input-area {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+#new-snippet {
+  flex: 1;
+}
+
+#add-btn {
+  background: var(--primary);
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.snippet {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.snippet-text {
+  flex: 1;
+  word-break: break-word;
+  padding-right: 16px;
+}
+
+.copy-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.copy-btn.copied {
+  background: var(--success);
+}
+
+/* ===== Misc ===== */
+.note {
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: 12px;
+}
+
+.empty {
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 24px 0;
+}
+
+.error {
+  background: #fee2e2;
+  color: var(--danger);
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 12px;
+}
+
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  background: white;
+  color: #5F6368;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.google-btn:hover {
+  background: #f8f9fa;
+}
+.google-btn .g-logo {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICA8cGF0aCBkPSJNMTIgMGgtOC4yYzAtMS40IDEuMi0yLjYgMi42LTIuNmMxLjQgMCAyLjYgMS4yIDIuNiAyLjZoOC4yYzEuNCAwIDIuNiAxLjIgMi42IDIuNnMtMS4yIDIuNi0yLjYgMi42SDQuNGMtMS40IDAtMi42LTEuMi0yLjYtMi42czEuMi0yLjYgMi42LTIuNnoiIGZpbGw9IiMzRjM5NDkiLz4KICA8cGF0aCBkPSJNMTIgMjRoLTguMmMtMS40IDAtMi42LTEuMi0yLjYtMi42czEuMi0yLjYgMi42LTIuNkgxMmMxLjQgMCAyLjYgMS4yIDIuNiAyLjZzLTEuMiAyLjYtMi42IDIuNnoiIGZpbGw9IiMzRjM5NDkiLz4KICA8cGF0aCBkPSJNMjAgMTJoLTguMmMtMS40IDAtMi42LTEuMi0yLjYtMi42czEuMi0yLjYgMi42LTIuNkgyMGMxLjQgMCAyLjYgMS4yIDIuNiAyLjZzLTEuMiAyLjYtMi42IDIuNnoiIGZpbGw9IiMzRjM5NDkiLz4KICA8cGF0aCBkPSJNMjAgMjRoLTguMmMtMS40IDAtMi42LTEuMi0yLjYtMi42czEuMi0yLjYgMi42LTIuNkgxMmMxLjQgMCAyLjYgMS4yIDIuNiAyLjZzLTEuMiAyLjYtMi42IDIuNnoiIGZpbGw9IiMzRjM5NDkiLz4KPC9zdmc+') no-repeat center;
+  background-size: contain;
+}
+.snippet-actions {
+  display: flex;
+  gap: 8px;
+}
+
+
+
+.icon-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
