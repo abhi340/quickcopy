@@ -2,17 +2,36 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="Cache-Control" content="no-store" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#6366f1" />
   <title>QuickCopy</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📋</text></svg>">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preload" href="style.css" as="style">
+  <link rel="modulepreload" href="index.js">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 </head>
 <body>
-  <div id="app">Loading QuickCopy…</div>
+  <noscript>
+    <div style="text-align:center; padding:2rem; background:#fee; color:#d32f2f; font-family:sans-serif;">
+      <h2>JavaScript Required</h2>
+      <p>QuickCopy needs JavaScript to function. Please enable it and reload.</p>
+    </div>
+  </noscript>
 
-  <!-- Firebase SDK via CDN (modular, tree-shakable) -->
+  <div id="app">
+    <div style="text-align:center; padding:2rem;">
+      <div style="font-size:24px; margin-bottom:1rem;">📋</div>
+      <p>Loading QuickCopy…</p>
+    </div>
+  </div>
+
+  <!-- Firebase SDK via CDN (MODULAR, CLEAN URLs — NO TRAILING SPACES!) -->
   <script type="module">
-    // Import Firebase modules from CDN
+    // ✅ FIXED: No trailing spaces — critical for Chrome ≥129
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
     import {
       getAuth,
@@ -46,7 +65,6 @@
       storageBucket: "quickcopy-d4d0f.firebasestorage.app",
       messagingSenderId: "122284453797",
       appId: "1:122284453797:web:2de998fedde56fbb7e824c"
-      // measurementId is optional → omitted for modular auth/firestore
     };
 
     // Initialize Firebase
@@ -54,10 +72,10 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Force re-login on refresh (security)
-    auth.setPersistence('none').catch(console.error);
+    // Security: disable persistence (force re-login on refresh)
+    auth.setPersistence('none').catch(err => console.warn('Persistence warning:', err));
 
-    // Expose to global scope for index.js
+    // ✅ Expose only what index.js needs — no pollution
     window.firebase = {
       app, auth, db, onAuthStateChanged,
       signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut,
@@ -65,9 +83,12 @@
       sendPasswordResetEmail, deleteUser, updateEmail,
       collection, addDoc, getDocs, query, where, updateDoc, deleteDoc, doc
     };
+
+    // Optional: Add App Check later (requires site key)
+    // import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app-check.js";
   </script>
 
   <!-- Your app logic -->
-  <script type="module" src="index.js?v=2"></script>
+  <script type="module" src="index.js"></script>
 </body>
 </html>
