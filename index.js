@@ -37,7 +37,11 @@ const ICONS = {
   edit: `<svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`,
   delete: `<svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path></svg>`,
   search: `<svg viewBox="0 0 24 24" class="search-icon-svg"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg>`,
-  profile: `<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`
+  profile: `<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
+  settings: `<svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"></path><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>`,
+  moon: `<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>`,
+  sun: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>`,
+  signout: `<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 01-2-2h4M16 17l5-5-5-5M21 12H9"></path></svg>`
 };
 
 // ===== UI HELPERS =====
@@ -167,18 +171,18 @@ function renderApp() {
   document.getElementById('app').innerHTML = `
     <div class="header">
       <h2 style="font-weight:800;font-size:1.5rem;">Hello, ${displayName}</h2>
-      <div class="profile-dropdown">
+      <div class="profile-dropdown-container">
         <button class="profile-btn" id="profile-btn">${ICONS.profile}</button>
         <div class="dropdown-menu" id="dropdown-menu" style="display:none;">
-          <button class="dropdown-item" id="view-profile">Profile</button>
-          <button class="dropdown-item" id="toggle-theme">${isDarkMode ? '☀️' : '🌙'} ${isDarkMode ? 'Light' : 'Dark'} Mode</button>
-          <button class="dropdown-item danger" id="delete-account">Delete Account</button>
-          <button class="dropdown-item" id="sign-out">Sign Out</button>
+          <button class="dropdown-item" id="view-profile"><span style="width:20px;height:20px;display:inline-block;margin-right:10px;">${ICONS.settings}</span> Settings</button>
+          <button class="dropdown-item" id="toggle-theme"><span style="width:20px;height:20px;display:inline-block;margin-right:10px;">${isDarkMode ? ICONS.sun : ICONS.moon}</span> ${isDarkMode ? 'Light' : 'Dark'} Mode</button>
+          <button class="dropdown-item danger" id="delete-account"><span style="width:20px;height:20px;display:inline-block;margin-right:10px;">${ICONS.delete}</span> Delete Account</button>
+          <button class="dropdown-item" id="sign-out"><span style="width:20px;height:20px;display:inline-block;margin-right:10px;">${ICONS.signout}</span> Sign Out</button>
         </div>
       </div>
     </div>
 
-    <div class="glass-card" style="padding: 16px; margin-bottom: 24px;">
+    <div class="glass-card" style="padding: 16px; margin-bottom: 24px; max-width:600px; margin-left:auto; margin-right:auto;">
       <div id="input-area" style="display:flex; gap:12px;">
         <input type="text" id="new-snippet" placeholder="Paste anything here..." autocomplete="off" style="margin:0;"/>
         <button id="add-btn" class="btn btn-primary" style="width:auto; padding:0 20px;">Add</button>
@@ -192,7 +196,7 @@ function renderApp() {
 
     <div id="snippets-list">
       ${filteredSnippets.length === 0 
-        ? `<div class="glass-card" style="text-align:center; color:var(--text-dim);">No clips found.</div>` 
+        ? `<div class="glass-card" style="text-align:center; color:var(--text-dim); grid-column: 1 / -1;">No clips found.</div>` 
         : filteredSnippets.map((item, i) => {
             const type = getSnippetType(item.text);
             return `
@@ -201,12 +205,10 @@ function renderApp() {
                 <div class="snippet-content">${escapeHtml(item.text)}</div>
                 <div class="snippet-footer">
                   <div class="actions-group">
-                    <button class="icon-btn copy-btn" data-index="${i}">${ICONS.copy}</button>
-                    <button class="icon-btn pin-btn ${item.pinned ? 'active' : ''}" data-id="${item.id}" data-pinned="${item.pinned}">${ICONS.pin}</button>
-                  </div>
-                  <div class="actions-group">
-                    <button class="icon-btn edit-btn" data-id="${item.id}" data-text="${escapeHtml(item.text)}">${ICONS.edit}</button>
-                    <button class="icon-btn delete-btn" data-id="${item.id}">${ICONS.delete}</button>
+                    <button class="icon-btn pin-btn ${item.pinned ? 'active' : ''}" data-id="${item.id}" data-pinned="${item.pinned}" title="Pin">${ICONS.pin}</button>
+                    <button class="icon-btn edit-btn" data-id="${item.id}" data-text="${escapeHtml(item.text)}" title="Edit">${ICONS.edit}</button>
+                    <button class="icon-btn copy-btn" data-index="${i}" title="Copy">${ICONS.copy}</button>
+                    <button class="icon-btn delete-btn" data-id="${item.id}" title="Delete">${ICONS.delete}</button>
                   </div>
                 </div>
               </div>
@@ -218,8 +220,11 @@ function renderApp() {
   // --- Events ---
   const profileBtn = document.getElementById('profile-btn');
   const dropdown = document.getElementById('dropdown-menu');
-  profileBtn.onclick = (e) => { e.stopPropagation(); dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block'; };
-  document.onclick = () => dropdown.style.display = 'none';
+  profileBtn.onclick = (e) => { 
+    e.stopPropagation(); 
+    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block'; 
+  };
+  document.onclick = () => { dropdown.style.display = 'none'; };
 
   document.getElementById('toggle-theme').onclick = () => { toggleTheme(); renderApp(); };
   document.getElementById('sign-out').onclick = () => signOut(auth);
@@ -242,22 +247,24 @@ function renderApp() {
 function showProfile() {
   document.getElementById('app').innerHTML = `
     <div class="header">
-      <button class="icon-btn" id="back-to-app" style="width:auto; padding:0 12px;">← Back</button>
+      <button class="icon-btn" id="back-to-app" style="width:auto; padding:0 12px; height:40px;">← Back</button>
       <h2 style="font-weight:800;">Settings</h2>
     </div>
-    <div class="glass-card">
-      <h3 style="margin-bottom:16px;">Appearance</h3>
-      <p style="color:var(--text-dim); margin-bottom:12px; font-size:0.9rem;">Choose your signature color:</p>
-      <div class="palette-grid">
-        ${palettes.map(p => `
-          <div class="palette-swatch ${activePalette.name === p.name ? 'active' : ''}" 
-               style="background: linear-gradient(135deg, ${p.primary}, ${p.secondary})"
-               onclick="window.setPaletteByName('${p.name}')"></div>
-        `).join('')}
+    <div style="max-width:600px; margin: 0 auto;">
+      <div class="glass-card">
+        <h3 style="margin-bottom:16px;">Appearance</h3>
+        <p style="color:var(--text-dim); margin-bottom:12px; font-size:0.9rem;">Choose your signature color:</p>
+        <div class="palette-grid">
+          ${palettes.map(p => `
+            <div class="palette-swatch ${activePalette.name === p.name ? 'active' : ''}" 
+                 style="background: linear-gradient(135deg, ${p.primary}, ${p.secondary})"
+                 onclick="window.setPaletteByName('${p.name}')"></div>
+          `).join('')}
+        </div>
       </div>
-    </div>
-    <div class="glass-card" style="text-align:center;">
-      <p style="color:var(--text-dim);">Logged in as<br><strong>${currentUser.email}</strong></p>
+      <div class="glass-card" style="text-align:center;">
+        <p style="color:var(--text-dim);">Logged in as<br><strong>${currentUser.email}</strong></p>
+      </div>
     </div>
   `;
   document.getElementById('back-to-app').onclick = renderApp;
