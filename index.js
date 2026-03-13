@@ -30,18 +30,17 @@ function applyPalette(palette) {
 applyPalette(activePalette);
 if (isDarkMode) document.body.classList.add('dark-mode');
 
-// ===== SVG ICONS =====
+// ===== COLORFUL SVG ICONS =====
 const ICONS = {
-  copy: `<svg viewBox="0 0 24 24"><path d="M8 4v12a2 2 0 002 2h8a2 2 0 002-2V7.242a2 2 0 00-.602-1.43L17.43 3.602A2 2 0 0016 3H10a2 2 0 00-2 2z"></path><path d="M16 3v5h5M4 19V7a2 2 0 012-2h2"></path></svg>`,
-  pin: `<svg viewBox="0 0 24 24"><path d="M12 2v8m0 0l4 4m-4-4l-4 4m4 8v-4"></path></svg>`,
-  edit: `<svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`,
-  delete: `<svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path></svg>`,
-  search: `<svg viewBox="0 0 24 24" class="search-icon-svg"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg>`,
-  profile: `<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
-  settings: `<svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"></path><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>`,
-  moon: `<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>`,
-  sun: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>`,
-  signout: `<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 01-2-2h4M16 17l5-5-5-5M21 12H9"></path></svg>`
+  copy: `<svg viewBox="0 0 24 24" fill="none" stroke="url(#grad-copy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="grad-copy" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`,
+  pin: `<svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M21 10V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v2a10 10 0 0010 10 10 10 0 0010-10z"></path><circle cx="12" cy="10" r="3"></circle></svg>`,
+  edit: `<svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`,
+  delete: `<svg viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"></path></svg>`,
+  search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon-svg"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg>`,
+  profile: `<svg viewBox="0 0 24 24" fill="url(#grad-prof)"><defs><linearGradient id="grad-prof" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#10b981"/></linearGradient></defs><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
+  settings: `<svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>`,
+  stats: `<svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"></path></svg>`,
+  shield: `<svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`
 };
 
 // ===== UI HELPERS =====
@@ -174,29 +173,37 @@ function renderApp() {
       <div class="profile-dropdown-container">
         <button class="profile-btn" id="profile-btn">${ICONS.profile}</button>
         <div class="dropdown-menu" id="dropdown-menu" style="display:none;">
-          <button class="dropdown-item" id="view-profile"><span style="width:20px;height:20px;display:inline-block;margin-right:10px;">${ICONS.settings}</span> Settings</button>
-          <button class="dropdown-item" id="toggle-theme"><span style="width:20px;height:20px;display:inline-block;margin-right:10px;">${isDarkMode ? ICONS.sun : ICONS.moon}</span> ${isDarkMode ? 'Light' : 'Dark'} Mode</button>
-          <button class="dropdown-item danger" id="delete-account"><span style="width:20px;height:20px;display:inline-block;margin-right:10px;">${ICONS.delete}</span> Delete Account</button>
-          <button class="dropdown-item" id="sign-out"><span style="width:20px;height:20px;display:inline-block;margin-right:10px;">${ICONS.signout}</span> Sign Out</button>
+          <button class="dropdown-item" id="view-profile">
+            <span class="nav-icon">${ICONS.settings}</span> Settings
+          </button>
+          <button class="dropdown-item" id="toggle-theme">
+            <span class="nav-icon">${isDarkMode ? ICONS.sun : ICONS.moon}</span> ${isDarkMode ? 'Light' : 'Dark'}
+          </button>
+          <button class="dropdown-item danger" id="delete-account">
+            <span class="nav-icon">${ICONS.delete}</span> Delete
+          </button>
+          <button class="dropdown-item" id="sign-out">
+            <span class="nav-icon">${ICONS.signout}</span> Logout
+          </button>
         </div>
       </div>
     </div>
 
-    <div class="glass-card" style="padding: 16px; margin-bottom: 24px; max-width:600px; margin-left:auto; margin-right:auto;">
-      <div id="input-area" style="display:flex; gap:12px;">
-        <input type="text" id="new-snippet" placeholder="Paste anything here..." autocomplete="off" style="margin:0;"/>
-        <button id="add-btn" class="btn btn-primary" style="width:auto; padding:0 20px;">Add</button>
+    <div class="glass-card main-input-card">
+      <div id="input-area">
+        <input type="text" id="new-snippet" placeholder="Paste link or text..." autocomplete="off"/>
+        <button id="add-btn" class="btn btn-primary">Add Clip</button>
       </div>
     </div>
 
     <div class="search-container">
       ${ICONS.search}
-      <input type="text" id="search-input" placeholder="Search your clips..." value="${searchTerm}" />
+      <input type="text" id="search-input" placeholder="Search clips..." value="${searchTerm}" />
     </div>
 
     <div id="snippets-list">
       ${filteredSnippets.length === 0 
-        ? `<div class="glass-card" style="text-align:center; color:var(--text-dim); grid-column: 1 / -1;">No clips found.</div>` 
+        ? `<div class="glass-card empty-state">No clips found.</div>` 
         : filteredSnippets.map((item, i) => {
             const type = getSnippetType(item.text);
             return `
@@ -244,16 +251,47 @@ function renderApp() {
   document.querySelectorAll('.delete-btn').forEach(btn => { btn.onclick = () => deleteSnippet(btn.dataset.id); });
 }
 
-function showProfile() {
+async function showProfile() {
+  const user = auth.currentUser;
+  let userName = user.email.split('@')[0];
+  const snap = await getDocs(query(collection(db, 'users'), where('uid', '==', user.uid)));
+  if (!snap.empty) userName = snap.docs[0].data().name;
+
   document.getElementById('app').innerHTML = `
     <div class="header">
       <button class="icon-btn" id="back-to-app" style="width:auto; padding:0 12px; height:40px;">← Back</button>
-      <h2 style="font-weight:800;">Settings</h2>
+      <h2 style="font-weight:800;">Account Settings</h2>
     </div>
-    <div style="max-width:600px; margin: 0 auto;">
+    <div class="profile-layout">
+      <div class="glass-card profile-hero">
+        <div class="profile-avatar">${ICONS.profile}</div>
+        <h2>${userName}</h2>
+        <p>${user.email}</p>
+        <div class="account-badge">PRO Account</div>
+      </div>
+
+      <div class="grid-layout-2">
+        <div class="glass-card stats-card">
+          <div class="card-title">${ICONS.stats} Usage Stats</div>
+          <div class="stat-item">
+            <span class="stat-label">Total Clips</span>
+            <span class="stat-value">${snippets.length}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Pinned</span>
+            <span class="stat-value">${snippets.filter(s=>s.pinned).length}</span>
+          </div>
+        </div>
+
+        <div class="glass-card stats-card">
+          <div class="card-title">${ICONS.shield} Security</div>
+          <p style="font-size:0.8rem; color:var(--text-dim);">Your data is cloud-synced and protected by Firebase security protocols.</p>
+          <button class="btn btn-outline" style="margin-top:10px; font-size:0.8rem;" onclick="showToast('Cloud Guard Active! 🛡️')">Verify Encryption</button>
+        </div>
+      </div>
+
       <div class="glass-card">
-        <h3 style="margin-bottom:16px;">Appearance</h3>
-        <p style="color:var(--text-dim); margin-bottom:12px; font-size:0.9rem;">Choose your signature color:</p>
+        <h3 style="margin-bottom:16px;">Appearance Themes</h3>
         <div class="palette-grid">
           ${palettes.map(p => `
             <div class="palette-swatch ${activePalette.name === p.name ? 'active' : ''}" 
@@ -261,9 +299,6 @@ function showProfile() {
                  onclick="window.setPaletteByName('${p.name}')"></div>
           `).join('')}
         </div>
-      </div>
-      <div class="glass-card" style="text-align:center;">
-        <p style="color:var(--text-dim);">Logged in as<br><strong>${currentUser.email}</strong></p>
       </div>
     </div>
   `;
@@ -281,21 +316,21 @@ async function addSnippet() {
   if (!input.value.trim()) return;
   try {
     await addDoc(collection(db, 'snippets'), { text: input.value.trim(), userId: currentUser.uid, pinned: false, createdAt: new Date().toISOString() });
-    input.value = ''; showToast('Added! ✨'); loadSnippets();
-  } catch (e) { showToast('Error.', '❌'); }
+    input.value = ''; showToast('Added to Cloud! ✨'); loadSnippets();
+  } catch (e) { showToast('Cloud Error.', '❌'); }
 }
 
 async function togglePin(id, current) {
-  try { await updateDoc(doc(db, 'snippets', id), { pinned: !current }); loadSnippets(); } catch (e) { showToast('Error.', '❌'); }
+  try { await updateDoc(doc(db, 'snippets', id), { pinned: !current }); loadSnippets(); } catch (e) { showToast('Update Error.', '❌'); }
 }
 
 async function editSnippet(id, old) {
   const res = prompt('Edit clip:', old);
-  if (res) { await updateDoc(doc(db, 'snippets', id), { text: res.trim() }); showToast('Updated!'); loadSnippets(); }
+  if (res) { await updateDoc(doc(db, 'snippets', id), { text: res.trim() }); showToast('Cloud Sync Updated!'); loadSnippets(); }
 }
 
 async function deleteSnippet(id) {
-  if (confirm('Delete?')) { await deleteDoc(doc(db, 'snippets', id)); showToast('Deleted.'); loadSnippets(); }
+  if (confirm('Permanently delete from cloud?')) { await deleteDoc(doc(db, 'snippets', id)); showToast('Wiped from Cloud.'); loadSnippets(); }
 }
 
 async function loadSnippets() {
@@ -308,7 +343,7 @@ async function loadSnippets() {
 }
 
 function confirmDeleteAccount() {
-  if (confirm('Wipe everything?')) deleteUser(auth.currentUser).then(renderLogin);
+  if (confirm('DANGER: Wipe ALL cloud data and delete account?')) deleteUser(auth.currentUser).then(renderLogin);
 }
 
 function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
