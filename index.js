@@ -287,10 +287,14 @@ function renderSnippets() {
 }
 
 async function showProfile() {
-  const user = auth.currentUser;
-  let userName = user.email.split('@')[0];
-  const snap = await getDocs(query(collection(db, 'users'), where('uid', '==', user.uid)));
-  if (!snap.empty) userName = snap.docs[0].data().name;
+  const user = auth.currentUser || currentUser;
+  let userName = user && user.email ? user.email.split('@')[0] : 'User';
+  try {
+    const snap = await getDocs(query(collection(db, 'users'), where('uid', '==', user.uid)));
+    if (!snap.empty) userName = snap.docs[0].data().name || userName;
+  } catch (err) {
+    console.warn("Could not fetch user profile", err);
+  }
 
   document.getElementById('app').innerHTML = `
     <div class="header">
