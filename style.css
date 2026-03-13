@@ -46,6 +46,109 @@ body {
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
 }
 
+/* ===== Auth Screens (Login/Signup) ===== */
+.auth-container {
+  max-width: 450px;
+  margin: 80px auto 0;
+  text-align: center;
+}
+
+.auth-container h1 {
+  font-size: 3.5rem;
+  font-weight: 900;
+  margin-bottom: 8px;
+  background: linear-gradient(to right, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -2px;
+}
+
+.auth-subtitle {
+  color: var(--text-dim);
+  margin-bottom: 32px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.auth-container .glass-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-container input {
+  width: 100%;
+  padding: 14px 20px;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  color: var(--text);
+  font-size: 1rem;
+  transition: all 0.2s;
+  margin: 0;
+  direction: ltr !important;
+}
+
+body:not(.dark-mode) .auth-container input {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.auth-container input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 0 4px var(--primary-glow);
+}
+
+.btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 15px var(--primary-glow);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--primary-glow);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  color: var(--text);
+}
+
+.btn-outline:hover {
+  background: var(--glass-border);
+}
+
+.google-btn {
+  background: var(--white);
+  color: #1f2937;
+  margin-top: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.google-btn:hover {
+  background: #f9fafb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
 /* ===== Header Layout ===== */
 .header {
   display: flex; justify-content: space-between; align-items: center;
@@ -191,12 +294,12 @@ body:not(.dark-mode) #search-input {
 .profile-layout { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
 .profile-hero { text-align: center; padding: 32px 20px; }
 .profile-avatar {
-  width: 70px; height: 70px; margin: 0 auto 12px; /* Scaled down avatar */
+  width: 70px; height: 70px; margin: 0 auto 12px;
   background: linear-gradient(135deg, var(--primary), var(--secondary));
   border-radius: 50%; display: flex; align-items: center; justify-content: center;
   box-shadow: 0 10px 25px var(--primary-glow);
 }
-.profile-avatar svg { width: 32px; height: 32px; } /* Scaled down icon */
+.profile-avatar svg { width: 32px; height: 32px; }
 
 .profile-hero h2 { font-size: 1.5rem; margin-bottom: 4px; }
 .profile-hero p { font-size: 0.9rem; color: var(--text-dim); }
@@ -211,10 +314,10 @@ body:not(.dark-mode) #search-input {
 }
 
 .card-title {
-  display: flex; align-items: center; gap: 8px; /* Balanced spacing */
+  display: flex; align-items: center; gap: 8px;
   font-weight: 800; margin-bottom: 12px; font-size: 1rem; color: var(--text);
 }
-.card-title svg { width: 18px; height: 18px; opacity: 0.8; } /* Scaled down supporting icons */
+.card-title svg { width: 18px; height: 18px; opacity: 0.8; }
 
 .stat-item {
   display: flex; justify-content: space-between; align-items: center;
@@ -232,7 +335,3 @@ body:not(.dark-mode) #search-input {
   height: 40px; border-radius: 10px; cursor: pointer; border: 2px solid transparent; transition: 0.2s;
 }
 .palette-swatch.active { border-color: white; transform: scale(1.05); box-shadow: 0 0 15px var(--primary-glow); }
-
-.auth-container { max-width: 450px; margin: 0 auto; }
-.auth-container h1 { font-size: 3rem; font-weight: 800; text-align: center; margin-bottom: 8px; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.auth-subtitle { text-align: center; color: var(--text-dim); margin-bottom: 32px; font-size: 0.95rem; }
