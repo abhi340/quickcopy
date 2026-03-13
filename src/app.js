@@ -174,8 +174,7 @@ function renderApp() {
 
   document.getElementById('settings-btn').onclick = (e) => {
     e.stopPropagation();
-    console.log("Settings opening...");
-    showProfile();
+    window.location.href = 'settings.html';
   };
 
   document.getElementById('toggle-theme-btn').onclick = (e) => {

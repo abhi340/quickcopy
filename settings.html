@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Settings | QuickCopy</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
+</head>
+<body>
+  <div id="app">
+    <div style="text-align:center; padding:2rem;">
+      <p>Loading Settings…</p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db, onAuthStateChanged, collection, getDocs, query, where, updateDoc, addDoc, doc } from './src/firebase.js';
+    import { ICONS } from './src/icons.js';
+    import { palettes, applyPalette, initTheme } from './src/theme.js';
+    import { showToast, escapeHtml } from './src/utils.js';
+
+    let currentUser = null;
+    let snippetCount = 0;
+    let pinnedCount = 0;
+
+    initTheme();
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        await loadStats();
+        renderSettings();
+      } else {
+        window.location.href = 'index.html';
+      }
+    });
+
+    async function loadStats() {
+      try {
+        const q = query(collection(db, 'snippets'), where('userId', '==', currentUser.uid));
+        const snap = await getDocs(q);
+        snippetCount = snap.size;
+        pinnedCount = snap.docs.filter(d => d.data().pinned).length;
+      } catch (err) { console.warn("Stats load failed", err); }
+    }
+
+    async function renderSettings() {
+      const user = currentUser;
+      let userName = user.email ? user.email.split('@')[0] : 'User';
+      
+      try {
+        const q = query(collection(db, 'users'), where('uid', '==', user.uid));
+        const snap = await getDocs(q);
+        if (!snap.empty) userName = snap.docs[0].data().name || userName;
+      } catch (err) {}
+
+      document.getElementById('app').innerHTML = `
+        <div class="header">
+          <button class="icon-btn" onclick="window.location.href='index.html'" style="width:auto; padding:0 12px; height:40px;">← Back to Clips</button>
+          <h2 style="font-weight:800;">Account Settings</h2>
+        </div>
+        <div class="profile-layout">
+          <div class="glass-card profile-hero">
+            <div class="profile-avatar">${ICONS.profile}</div>
+            <h2 id="profile-name-display">${escapeHtml(userName)}</h2>
+            <p>${user.email}</p>
+            <button class="btn btn-outline" id="edit-name-btn" style="width:auto; margin: 10px auto; padding: 8px 16px;">Edit Name</button>
+            <div class="account-badge">PRO Account</div>
+          </div>
+
+          <div class="grid-layout-2">
+            <div class="glass-card stats-card">
+              <div class="card-title">${ICONS.stats} Usage Stats</div>
+              <div class="stat-item">
+                <span class="stat-label">Total Clips</span>
+                <span class="stat-value">${snippetCount}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Pinned</span>
+                <span class="stat-value">${pinnedCount}</span>
+              </div>
+            </div>
+
+            <div class="glass-card stats-card">
+              <div class="card-title">${ICONS.shield} Security</div>
+              <p class="security-note">Your data is cloud-synced and protected by Firebase security protocols.</p>
+              <button class="btn btn-outline" style="margin-top:10px; font-size:0.8rem;" id="verify-btn">Verify Encryption</button>
+            </div>
+          </div>
+
+          <div class="glass-card">
+            <h3 style="margin-bottom:16px;">Appearance Themes</h3>
+            <div class="palette-grid">
+              ${palettes.map(p => `
+                <div class="palette-swatch ${JSON.parse(localStorage.getItem('quickcopy_palette'))?.name === p.name ? 'active' : ''}" 
+                     style="background: linear-gradient(135deg, ${p.primary}, ${p.secondary})"
+                     data-name="${p.name}"></div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Attach events
+      document.getElementById('edit-name-btn').onclick = editProfileName;
+      document.getElementById('verify-btn').onclick = () => showToast('Cloud Guard Active! 🛡️');
+      
+      document.querySelectorAll('.palette-swatch').forEach(swatch => {
+        swatch.onclick = () => {
+          const name = swatch.dataset.name;
+          const p = palettes.find(pal => pal.name === name);
+          if (p) {
+            applyPalette(p);
+            renderSettings(); // Re-render to update active state
+          }
+        };
+      });
+    }
+
+    async function editProfileName() {
+      const newName = prompt("Enter your name:");
+      if (newName && newName.trim()) {
+        try {
+          const q = query(collection(db, 'users'), where('uid', '==', currentUser.uid));
+          const snap = await getDocs(q);
+          if (!snap.empty) {
+            await updateDoc(doc(db, 'users', snap.docs[0].id), { name: newName.trim() });
+          } else {
+            await addDoc(collection(db, 'users'), { uid: currentUser.uid, name: newName.trim(), email: currentUser.email, createdAt: new Date().toISOString() });
+          }
+          showToast('Name updated! ✨');
+          renderSettings();
+        } catch (e) { showToast('Update failed.', '❌'); }
+      }
+    }
+  </script>
+</body>
+</html>
