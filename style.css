@@ -7,8 +7,8 @@
   --success: #10b981;
   --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
   --glass: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-heavy: rgba(15, 23, 42, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.15); /* Slightly more visible */
+  --glass-heavy: rgba(15, 23, 42, 0.85);
   --text: #f8fafc;
   --text-dim: #94a3b8;
   --white: #ffffff;
@@ -19,8 +19,8 @@
 body:not(.dark-mode) {
   --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   --glass: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.5);
-  --glass-heavy: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-heavy: rgba(255, 255, 255, 0.95);
   --text: #1e293b;
   --text-dim: #64748b;
   --hover-bg: rgba(99, 102, 241, 0.1);
@@ -77,12 +77,12 @@ body {
   margin-bottom: 24px;
   gap: 20px;
   background: var(--glass);
-  padding: 12px 24px; /* More compact header */
+  padding: 12px 24px;
   border-radius: 20px;
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(10px);
   position: relative;
-  z-index: 1000; /* Header stays high */
+  z-index: 1000; /* Ensures header is above main content but below dropdown */
 }
 
 .user-greeting {
@@ -99,12 +99,24 @@ body {
 
 #search-input {
   width: 100%;
-  background: rgba(0, 0, 0, 0.1);
-  padding: 10px 16px 10px 44px; /* More compact */
+  background: rgba(0, 0, 0, 0.2);
+  padding: 10px 16px 10px 44px;
   border-radius: 12px;
   margin: 0;
-  border: 1px solid var(--glass-border);
+  border: 2px solid var(--glass-border); /* Clear visible border */
   font-size: 0.9rem;
+  color: var(--text);
+  transition: border-color 0.2s;
+}
+
+#search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+body:not(.dark-mode) #search-input {
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(0, 0, 0, 0.1);
 }
 
 .search-icon-svg {
@@ -117,13 +129,13 @@ body {
   height: 18px;
 }
 
-/* ===== Main Input Area (Compact) ===== */
+/* ===== Main Input Area ===== */
 .main-input-card {
-  padding: 14px 20px; /* Reduced padding */
+  padding: 14px 20px;
   max-width: 100%;
   margin-bottom: 24px;
   position: relative;
-  z-index: 1; /* Lower than header dropdown */
+  z-index: 1; /* Stay behind the dropdown */
 }
 
 #input-area {
@@ -134,7 +146,7 @@ body {
 #input-area input {
   margin: 0;
   flex: 1;
-  padding: 10px 16px; /* Compact input */
+  padding: 10px 16px;
   font-size: 0.95rem;
 }
 
@@ -160,11 +172,29 @@ body {
   border: 1px solid var(--glass-border);
   border-radius: 18px;
   width: 220px;
-  z-index: 2000 !important; /* Always on top */
+  z-index: 9999 !important; /* Forces dropdown to the very top */
   overflow: hidden;
   box-shadow: 0 15px 40px rgba(0,0,0,0.6);
   padding: 6px;
 }
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.dropdown-item:hover { background: var(--hover-bg); }
+.dropdown-item.danger:hover { background: rgba(244, 63, 94, 0.2); color: #fb7185; }
 
 /* ===== Snippets GRID System ===== */
 #snippets-list {
@@ -209,6 +239,10 @@ body {
   align-self: flex-start;
 }
 
+.badge-code { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.badge-link { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+.badge-text { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+
 .snippet-content {
   font-size: 0.95rem;
   line-height: 1.5;
@@ -219,13 +253,14 @@ body {
 
 .snippet-footer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-end; /* Buttons on the Right */
   border-top: 1px solid var(--glass-border);
   padding-top: 12px;
 }
 
 .actions-group {
   display: flex;
+  flex-direction: row; /* FORCE HORIZONTAL ICONS */
   gap: 8px;
 }
 
@@ -246,8 +281,7 @@ body {
 .icon-btn:hover { background: var(--glass-border); }
 .pin-btn.active svg { fill: #f59e0b; stroke: #f59e0b; }
 
-/* ===== Profile Dashboard ===== */
-.profile-layout { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+/* Profile Avatar & Hero */
 .profile-hero { text-align: center; padding: 32px; }
 .profile-avatar {
   width: 90px; height: 90px; margin: 0 auto 16px;
@@ -256,34 +290,12 @@ body {
 }
 .profile-avatar svg { width: 40px; height: 40px; }
 
-.grid-layout-2 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-}
-
-.card-title {
-  display: flex; align-items: center; gap: 10px;
-  font-weight: 800; margin-bottom: 16px; font-size: 1.1rem;
-}
-
-/* Dropdown Hover */
-.dropdown-item {
-  display: flex; align-items: center; gap: 12px;
-  width: 100%; padding: 12px 16px; border-radius: 12px;
-  background: none; border: none; color: var(--text);
-  font-weight: 600; cursor: pointer; transition: 0.2s;
-}
-.dropdown-item:hover { background: var(--hover-bg); }
-.dropdown-item.danger:hover { background: rgba(244, 63, 94, 0.2); color: #fb7185; }
-
 /* Toast */
-.toast-container { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 3000; }
+.toast-container { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 10000; }
 .toast {
   background: var(--glass-heavy); border: 1px solid var(--glass-border);
   padding: 14px 28px; border-radius: 50px; color: white;
   font-weight: 700; display: flex; align-items: center; gap: 12px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
 }
 
 .empty-state { text-align: center; color: var(--text-dim); padding: 40px; grid-column: 1 / -1; }
