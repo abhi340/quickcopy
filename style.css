@@ -12,6 +12,7 @@
   --text: #f8fafc;
   --text-dim: #94a3b8;
   --white: #ffffff;
+  --hover-bg: rgba(255, 255, 255, 0.1);
 }
 
 /* Light mode overrides */
@@ -22,6 +23,7 @@ body:not(.dark-mode) {
   --glass-heavy: rgba(255, 255, 255, 0.9);
   --text: #1e293b;
   --text-dim: #64748b;
+  --hover-bg: rgba(99, 102, 241, 0.1);
 }
 
 /* ===== Base Styles ===== */
@@ -46,7 +48,7 @@ body {
 
 #app {
   width: 100%;
-  max-width: 1100px;
+  max-width: 1400px; /* Expanded for better space utilization */
   margin-top: 40px;
   animation: fadeIn 0.6s ease-out;
 }
@@ -153,8 +155,8 @@ input:focus {
 /* ===== Main Dashboard Layout ===== */
 .main-input-card {
   padding: 20px;
-  max-width: 700px;
-  margin: 0 auto 32px;
+  max-width: 100%; /* Full width within container */
+  margin-bottom: 32px;
 }
 
 #input-area {
@@ -170,7 +172,7 @@ input:focus {
   top: 20px;
   z-index: 100;
   margin-bottom: 32px;
-  max-width: 700px;
+  max-width: 100%; /* Full width within container */
   margin-left: auto;
   margin-right: auto;
 }
@@ -207,6 +209,10 @@ input:focus {
 
 @media (min-width: 1200px) {
   #snippets-list { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 1600px) {
+  #snippets-list { grid-template-columns: repeat(4, 1fr); }
 }
 
 .snippet-card {
@@ -262,7 +268,7 @@ input:focus {
 
 .actions-group {
   display: flex;
-  flex-direction: row; /* Force horizontal icons */
+  flex-direction: row;
   gap: 10px;
 }
 
@@ -350,7 +356,7 @@ input:focus {
   margin-bottom: 2px;
 }
 .dropdown-item:last-child { margin-bottom: 0; }
-.dropdown-item:hover { background: rgba(255,255,255,0.1); }
+.dropdown-item:hover { background: var(--hover-bg); } /* Dynamic hover bg */
 .dropdown-item.danger:hover { background: rgba(244, 63, 94, 0.2); color: #fb7185; }
 
 .nav-icon {
@@ -365,7 +371,7 @@ input:focus {
   background: var(--glass-heavy); backdrop-filter: blur(15px);
   border: 1px solid var(--glass-border); padding: 16px 32px;
   border-radius: 100px; color: white; font-weight: 700;
-  display: flex; align-items: center; gap: 14px;
+  display: flex; align-items: center; gap: 12px;
   box-shadow: 0 15px 45px rgba(0,0,0,0.5);
   animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
