@@ -161,10 +161,12 @@ body:not(.dark-mode) .auth-container input {
 .header-search-container { flex: 1; max-width: 500px; position: relative; }
 
 #search-input {
-  width: 100%; background: rgba(0, 0, 0, 0.2);
+  width: 100%; background: var(--glass);
   padding: 10px 16px 10px 44px; border-radius: 12px; margin: 0;
   border: 2px solid var(--glass-border); font-size: 0.9rem;
   color: var(--text); transition: border-color 0.2s;
+  direction: ltr !important;
+  text-align: left;
 }
 #search-input:focus { outline: none; border-color: var(--primary); }
 
@@ -260,6 +262,8 @@ body:not(.dark-mode) .auth-container input {
   word-break: break-word; 
   overflow-wrap: anywhere; 
   white-space: pre-wrap; 
+  direction: ltr !important;
+  text-align: left;
 }
 
 .snippet-footer { display: flex; justify-content: flex-end; border-top: 1px solid var(--glass-border); padding-top: 12px; }

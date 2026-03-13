@@ -220,7 +220,13 @@ function renderApp() {
   document.getElementById('toggle-theme').onclick = () => { toggleTheme(); renderApp(); renderSnippets(); };
   document.getElementById('sign-out').onclick = () => signOut(auth);
   document.getElementById('delete-account').onclick = confirmDeleteAccount;
-  document.getElementById('view-profile-btn').onclick = (e) => { e.stopPropagation(); showProfile(); };
+  document.getElementById('view-profile-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("Settings clicked");
+    showProfile();
+  });
+  
   document.getElementById('add-btn').onclick = addSnippet;
   document.getElementById('new-snippet').onkeypress = (e) => { if (e.key === 'Enter') addSnippet(); };
 
