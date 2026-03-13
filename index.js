@@ -4,53 +4,6 @@ const { auth, db, onAuthStateChanged, signInWithEmailAndPassword, createUserWith
 let currentUser = null;
 let snippets = [];
 let isDarkMode = localStorage.getItem('quickcopy_dark_mode') === 'true';
-let encryptionKey = null; // Derived from user's master key
-
-// ===== CRYPTO UTILS (AES-GCM) =====
-async function deriveKey(passphrase, salt) {
-  const encoder = new TextEncoder();
-  const baseKey = await crypto.subtle.importKey(
-    'raw', encoder.encode(passphrase), 'PBKDF2', false, ['deriveKey']
-  );
-  return crypto.subtle.deriveKey(
-    { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
-    baseKey,
-    { name: 'AES-GCM', length: 256 },
-    true, ['encrypt', 'decrypt']
-  );
-}
-
-async function encryptText(text) {
-  if (!encryptionKey) return text;
-  const encoder = new TextEncoder();
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const encrypted = await crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv },
-    encryptionKey,
-    encoder.encode(text)
-  );
-  const combined = new Uint8Array(iv.length + encrypted.byteLength);
-  combined.set(iv);
-  combined.set(new Uint8Array(encrypted), iv.length);
-  return btoa(String.fromCharCode(...combined));
-}
-
-async function decryptText(ciphertext) {
-  if (!encryptionKey) return ciphertext;
-  try {
-    const combined = new Uint8Array(atob(ciphertext).split('').map(c => c.charCodeAt(0)));
-    const iv = combined.slice(0, 12);
-    const data = combined.slice(12);
-    const decrypted = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv },
-      encryptionKey,
-      data
-    );
-    return new TextDecoder().decode(decrypted);
-  } catch (e) {
-    return "[Decryption Failed - Check Master Key]";
-  }
-}
 
 if (isDarkMode) document.body.classList.add('dark-mode');
 
@@ -270,41 +223,14 @@ async function showProfile() {
   document.getElementById('back-to-app2').onclick = renderApp;
 }
 
-// ===== MASTER KEY PROMPT =====
-function renderMasterKeyPrompt() {
-  document.getElementById('app').innerHTML = `
-    <h1>Unlock Secure Vault</h1>
-    <div class="card">
-      <p>Enter your <strong>Master Key</strong> to encrypt and decrypt your snippets.</p>
-      <input type="password" id="master-key-input" placeholder="Master Key" />
-      <button class="btn primary" id="unlock-btn">Unlock Vault</button>
-      <div id="master-key-error" class="error" style="display:none;"></div>
-      <p class="note">This key is never sent to the server. Forgot it? Your snippets will be unreadable.</p>
-    </div>
-  `;
-
-  document.getElementById('unlock-btn').onclick = async () => {
-    const passphrase = document.getElementById('master-key-input').value;
-    if (!passphrase) return showError('Please enter your Master Key.', 'master-key-error');
-    try {
-      const salt = new TextEncoder().encode(currentUser.uid);
-      encryptionKey = await deriveKey(passphrase, salt);
-      loadSnippets();
-    } catch (err) {
-      showError('Failed to initialize security.', 'master-key-error');
-    }
-  };
-}
-
 // ===== SNIPPET FUNCTIONS =====
 async function addSnippet() {
   const input = document.getElementById('new-snippet');
   const value = input.value.trim();
   if (!value) return;
   try {
-    const encryptedText = await encryptText(value);
     await addDoc(collection(db, 'snippets'), {
-      text: encryptedText,
+      text: value,
       userId: currentUser.uid,
       createdAt: new Date().toISOString()
     });
@@ -320,8 +246,7 @@ async function editSnippet(id, index) {
   const newText = prompt('Edit your snippet:', currentText);
   if (newText === null || newText.trim() === '') return;
   try {
-    const encryptedText = await encryptText(newText.trim());
-    await updateDoc(doc(db, 'snippets', id), { text: encryptedText });
+    await updateDoc(doc(db, 'snippets', id), { text: newText.trim() });
     await loadSnippets();
   } catch (err) {
     showError('Failed to update snippet.');
@@ -368,7 +293,6 @@ function confirmDeleteAccount() {
     snap.forEach(doc => promises.push(deleteDoc(doc.ref)));
     await Promise.all(promises);
     currentUser = null;
-    encryptionKey = null;
     renderLogin();
   }).catch(err => showError('Failed to delete account.'));
 }
@@ -379,14 +303,7 @@ async function loadSnippets() {
     const q = query(collection(db, 'snippets'), where('userId', '==', currentUser.uid));
     const snap = await getDocs(q);
     snippets = [];
-    
-    // Process snippets sequentially for decryption
-    for (const docSnap of snap.docs) {
-      const data = docSnap.data();
-      const decryptedText = await decryptText(data.text);
-      snippets.push({ id: docSnap.id, ...data, text: decryptedText });
-    }
-    
+    snap.forEach(doc => snippets.push({ id: doc.id, ...doc.data() }));
     snippets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     renderApp();
   } catch (err) {
@@ -424,14 +341,9 @@ function getFriendlyAuthError(code) {
 onAuthStateChanged(auth, (user) => {
   if (user) {
     currentUser = user;
-    if (!encryptionKey) {
-      renderMasterKeyPrompt();
-    } else {
-      loadSnippets();
-    }
+    loadSnippets();
   } else {
     currentUser = null;
-    encryptionKey = null; // Clear key on logout
     renderLogin();
   }
 });
