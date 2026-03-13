@@ -14,7 +14,8 @@ const ICONS = {
   shield: `<svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
   sun: `<svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>`,
   moon: `<svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>`,
-  signout: `<svg viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 01-2-2h4M16 17l5-5-5-5M21 12H9"></path></svg>`
+  signout: `<svg viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 01-2-2h4M16 17l5-5-5-5M21 12H9"></path></svg>`,
+  google: `<svg viewBox="0 0 24 24" width="18" height="18"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>`
 };
 
 let currentUser = null;
@@ -86,13 +87,14 @@ function renderLogin() {
       <h1>QuickCopy</h1>
       <p class="auth-subtitle">Your clipboard, everywhere.</p>
       <div class="glass-card">
-        <div class="input-group"><input type="email" id="login-email" placeholder="Email" autocomplete="email" /></div>
-        <div class="input-group"><input type="password" id="login-password" placeholder="Password" autocomplete="current-password" /></div>
+        <input type="email" id="login-email" placeholder="Email" autocomplete="email" />
+        <input type="password" id="login-password" placeholder="Password" autocomplete="current-password" />
         <button class="btn btn-primary" id="login-btn">Sign In</button>
         <button class="btn btn-outline" id="forgot-password">Forgot Password?</button>
         <button class="btn btn-outline" id="show-signup">Create New Account</button>
+        
         <div class="google-btn btn" id="google-signin-btn">
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" width="18" alt="G">
+          <span class="nav-icon">${ICONS.google}</span>
           <span>Continue with Google</span>
         </div>
         <div id="login-error" class="error" style="display:none;"></div>
@@ -122,9 +124,9 @@ function showForgotPasswordModal() {
       <h1>Reset</h1>
       <p class="auth-subtitle">Enter email for reset link.</p>
       <div class="glass-card">
-        <div class="input-group"><input type="email" id="reset-email" placeholder="Email" /></div>
+        <input type="email" id="reset-email" placeholder="Email" />
         <button class="btn btn-primary" id="send-reset">Send Reset Link</button>
-        <button class="btn btn-outline" id="back-to-login">← Back</button>
+        <button class="btn btn-outline" id="back-to-login">← Back to Sign In</button>
         <div id="reset-error" class="error" style="display:none;"></div>
       </div>
     </div>
@@ -143,10 +145,10 @@ function renderSignup() {
       <h1>Join Us</h1>
       <p class="auth-subtitle">Start syncing in seconds.</p>
       <div class="glass-card">
-        <input type="text" id="signup-name" placeholder="Full Name" style="margin-bottom:12px;" />
-        <input type="email" id="signup-email" placeholder="Email" style="margin-bottom:12px;" />
-        <input type="password" id="signup-password" placeholder="Password (8+ chars)" style="margin-bottom:12px;" />
-        <input type="password" id="signup-confirm" placeholder="Confirm Password" style="margin-bottom:20px;" />
+        <input type="text" id="signup-name" placeholder="Full Name" />
+        <input type="email" id="signup-email" placeholder="Email" />
+        <input type="password" id="signup-password" placeholder="Password (8+ chars)" />
+        <input type="password" id="signup-confirm" placeholder="Confirm Password" />
         <button class="btn btn-primary" id="signup-btn">Create Account</button>
         <button class="btn btn-outline" id="back-to-login">Already have an account?</button>
         <div id="signup-error" class="error" style="display:none;"></div>
@@ -199,7 +201,7 @@ function renderApp() {
     <div class="glass-card main-input-card">
       <div id="input-area">
         <input type="text" id="new-snippet" placeholder="Paste link or text..." autocomplete="off"/>
-        <button id="add-btn" class="btn btn-primary">Add Clip</button>
+        <button id="add-btn">Add Clip</button>
       </div>
     </div>
 
