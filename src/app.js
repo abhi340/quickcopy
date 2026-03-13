@@ -114,13 +114,15 @@ function renderSignup() {
 function renderApp() {
   if (!currentUser) return;
   const displayName = currentUser.email ? currentUser.email.split('@')[0] : 'User';
-  
+  const safeDisplayName = escapeHtml(displayName);
+  const safeSearchTerm = escapeHtml(searchTerm);
+
   document.getElementById('app').innerHTML = `
     <div class="header">
-      <div class="user-greeting">Hello, ${displayName}</div>
+      <div class="user-greeting">Hello, ${safeDisplayName}</div>
       <div class="header-search-container">
         ${ICONS.search}
-        <input type="text" id="search-input" placeholder="Search clips..." value="${searchTerm}" />
+        <input type="text" id="search-input" placeholder="Search clips..." value="${safeSearchTerm}" />
       </div>
       <div class="profile-dropdown-container">
         <button class="profile-btn" id="profile-btn">${ICONS.profile}</button>
