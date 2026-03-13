@@ -218,7 +218,8 @@ input:focus {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 200px; /* Uniform minimum height */
+  min-height: 200px;
+  cursor: pointer;
 }
 
 .snippet-card:hover {
@@ -257,6 +258,11 @@ input:focus {
   justify-content: flex-end;
   border-top: 1px solid var(--glass-border);
   padding-top: 16px;
+}
+
+.actions-group {
+  display: flex;
+  flex-direction: row; /* Force horizontal icons */
   gap: 10px;
 }
 
@@ -274,7 +280,7 @@ input:focus {
   transition: 0.2s;
 }
 
-.icon-btn svg { width: 20px; height: 22px; }
+.icon-btn svg { width: 20px; height: 20px; }
 .icon-btn:hover { background: var(--glass-border); transform: scale(1.05); }
 .pin-btn.active svg { fill: #f59e0b; stroke: #f59e0b; }
 

@@ -211,7 +211,7 @@ function renderApp() {
         : filteredSnippets.map((item, i) => {
             const type = getSnippetType(item.text);
             return `
-              <div class="snippet-card ${item.pinned ? 'pinned' : ''}">
+              <div class="snippet-card ${item.pinned ? 'pinned' : ''}" data-index="${i}" title="Click to copy">
                 <span class="badge badge-${type}">${type}</span>
                 <div class="snippet-content">${escapeHtml(item.text)}</div>
                 <div class="snippet-footer">
@@ -247,12 +247,29 @@ function renderApp() {
   const searchInput = document.getElementById('search-input');
   searchInput.oninput = (e) => { searchTerm = e.target.value; renderApp(); document.getElementById('search-input').focus(); };
 
-  document.querySelectorAll('.copy-btn').forEach(btn => {
-    btn.onclick = () => { navigator.clipboard.writeText(filteredSnippets[btn.dataset.index].text); showToast('Copied! 📋'); };
+  // Copy by clicking the card
+  document.querySelectorAll('.snippet-card').forEach(card => {
+    card.onclick = (e) => {
+      // Prevent copy if clicking buttons
+      if (e.target.closest('.icon-btn')) return;
+      const idx = card.dataset.index;
+      navigator.clipboard.writeText(filteredSnippets[idx].text);
+      showToast('Copied to clipboard! 📋');
+    };
   });
-  document.querySelectorAll('.pin-btn').forEach(btn => { btn.onclick = () => togglePin(btn.dataset.id, btn.dataset.pinned === 'true'); });
-  document.querySelectorAll('.edit-btn').forEach(btn => { btn.onclick = () => editSnippet(btn.dataset.id, btn.dataset.text); });
-  document.querySelectorAll('.delete-btn').forEach(btn => { btn.onclick = () => deleteSnippet(btn.dataset.id); });
+
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const idx = btn.dataset.index;
+      navigator.clipboard.writeText(filteredSnippets[idx].text);
+      showToast('Copied! 📋');
+    };
+  });
+
+  document.querySelectorAll('.pin-btn').forEach(btn => { btn.onclick = (e) => { e.stopPropagation(); togglePin(btn.dataset.id, btn.dataset.pinned === 'true'); }; });
+  document.querySelectorAll('.edit-btn').forEach(btn => { btn.onclick = (e) => { e.stopPropagation(); editSnippet(btn.dataset.id, btn.dataset.text); }; });
+  document.querySelectorAll('.delete-btn').forEach(btn => { btn.onclick = (e) => { e.stopPropagation(); deleteSnippet(btn.dataset.id); }; });
 }
 
 async function showProfile() {
