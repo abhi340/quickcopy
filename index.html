@@ -11,7 +11,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📋</text></svg>">
   <link rel="manifest" href="manifest.json">
   <link rel="preload" href="style.css" as="style">
-  <link rel="modulepreload" href="index.js">
+  <link rel="modulepreload" href="src/app.js">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 </head>
 <body>
@@ -29,58 +29,7 @@
     </div>
   </div>
 
-  <!-- Firebase SDK via CDN (MODULAR, CLEAN URLs — NO TRAILING SPACES!) -->
-  <script type="module">
-    // ✅ FIXED: No trailing spaces — critical for Chrome ≥129
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-    import {
-      getAuth,
-      signInWithEmailAndPassword,
-      createUserWithEmailAndPassword,
-      signOut,
-      onAuthStateChanged,
-      GoogleAuthProvider,
-      signInWithPopup,
-      sendPasswordResetEmail,
-      deleteUser,
-      updateEmail
-    } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-    import {
-      getFirestore,
-      collection,
-      addDoc,
-      getDocs,
-      query,
-      where,
-      updateDoc,
-      deleteDoc,
-      doc
-    } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
-
-    import { firebaseConfig } from './firebase-config.js';
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // Security: disable persistence (force re-login on refresh)
-    auth.setPersistence('none').catch(err => console.warn('Persistence warning:', err));
-
-    // ✅ Expose only what index.js needs — no pollution
-    window.firebase = {
-      app, auth, db, onAuthStateChanged,
-      signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut,
-      GoogleAuthProvider, signInWithPopup,
-      sendPasswordResetEmail, deleteUser, updateEmail,
-      collection, addDoc, getDocs, query, where, updateDoc, deleteDoc, doc
-    };
-
-    // Optional: Add App Check later (requires site key)
-    // import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app-check.js";
-  </script>
-
-  <!-- Your app logic -->
-  <script type="module" src="index.js"></script>
+  <!-- App logic is now modularized -->
+  <script type="module" src="src/app.js"></script>
 </body>
 </html>
