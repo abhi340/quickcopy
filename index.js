@@ -14,8 +14,7 @@ const ICONS = {
   shield: `<svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
   sun: `<svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>`,
   moon: `<svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>`,
-  signout: `<svg viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 01-2-2h4M16 17l5-5-5-5M21 12H9"></path></svg>`,
-  user: `<svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`
+  signout: `<svg viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 01-2-2h4M16 17l5-5-5-5M21 12H9"></path></svg>`
 };
 
 let currentUser = null;
@@ -173,11 +172,15 @@ function renderApp() {
 
   document.getElementById('app').innerHTML = `
     <div class="header">
-      <h2 style="font-weight:800;font-size:1.5rem;">Hello, ${displayName}</h2>
+      <div class="user-greeting">Hello, ${displayName}</div>
+      <div class="header-search-container">
+        ${ICONS.search}
+        <input type="text" id="search-input" placeholder="Search clips..." value="${searchTerm}" />
+      </div>
       <div class="profile-dropdown-container">
         <button class="profile-btn" id="profile-btn">${ICONS.profile}</button>
         <div class="dropdown-menu" id="dropdown-menu" style="display:none;">
-          <button class="dropdown-item" id="view-profile">
+          <button class="dropdown-item" id="view-profile-btn">
             <span class="nav-icon">${ICONS.settings}</span> Settings
           </button>
           <button class="dropdown-item" id="toggle-theme">
@@ -198,11 +201,6 @@ function renderApp() {
         <input type="text" id="new-snippet" placeholder="Paste link or text..." autocomplete="off"/>
         <button id="add-btn" class="btn btn-primary">Add Clip</button>
       </div>
-    </div>
-
-    <div class="search-container">
-      ${ICONS.search}
-      <input type="text" id="search-input" placeholder="Search clips..." value="${searchTerm}" />
     </div>
 
     <div id="snippets-list">
@@ -240,7 +238,7 @@ function renderApp() {
   document.getElementById('toggle-theme').onclick = () => { toggleTheme(); renderApp(); };
   document.getElementById('sign-out').onclick = () => signOut(auth);
   document.getElementById('delete-account').onclick = confirmDeleteAccount;
-  document.getElementById('view-profile').onclick = showProfile;
+  document.getElementById('view-profile-btn').onclick = (e) => { e.stopPropagation(); showProfile(); };
   document.getElementById('add-btn').onclick = addSnippet;
   document.getElementById('new-snippet').onkeypress = (e) => { if (e.key === 'Enter') addSnippet(); };
 
@@ -250,7 +248,6 @@ function renderApp() {
   // Copy by clicking the card
   document.querySelectorAll('.snippet-card').forEach(card => {
     card.onclick = (e) => {
-      // Prevent copy if clicking buttons
       if (e.target.closest('.icon-btn')) return;
       const idx = card.dataset.index;
       navigator.clipboard.writeText(filteredSnippets[idx].text);
