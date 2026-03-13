@@ -7,15 +7,46 @@ let filteredSnippets = [];
 let isDarkMode = localStorage.getItem('quickcopy_dark_mode') === 'true';
 let searchTerm = '';
 
+// ===== PALETTE SYSTEM =====
+const palettes = [
+  { name: 'Indigo', primary: '#6366f1', secondary: '#a855f7' },
+  { name: 'Emerald', primary: '#10b981', secondary: '#3b82f6' },
+  { name: 'Rose', primary: '#f43f5e', secondary: '#fb923c' },
+  { name: 'Amber', primary: '#f59e0b', secondary: '#d946ef' },
+  { name: 'Cyan', primary: '#06b6d4', secondary: '#6366f1' },
+  { name: 'Slate', primary: '#475569', secondary: '#94a3b8' }
+];
+
+let activePalette = JSON.parse(localStorage.getItem('quickcopy_palette')) || palettes[0];
+
+function applyPalette(palette) {
+  activePalette = palette;
+  localStorage.setItem('quickcopy_palette', JSON.stringify(palette));
+  document.documentElement.style.setProperty('--primary', palette.primary);
+  document.documentElement.style.setProperty('--primary-glow', palette.primary + '80');
+  document.documentElement.style.setProperty('--secondary', palette.secondary);
+}
+
+applyPalette(activePalette);
 if (isDarkMode) document.body.classList.add('dark-mode');
 
+// ===== SVG ICONS =====
+const ICONS = {
+  copy: `<svg viewBox="0 0 24 24"><path d="M8 4v12a2 2 0 002 2h8a2 2 0 002-2V7.242a2 2 0 00-.602-1.43L17.43 3.602A2 2 0 0016 3H10a2 2 0 00-2 2z"></path><path d="M16 3v5h5M4 19V7a2 2 0 012-2h2"></path></svg>`,
+  pin: `<svg viewBox="0 0 24 24"><path d="M12 2v8m0 0l4 4m-4-4l-4 4m4 8v-4"></path></svg>`,
+  edit: `<svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`,
+  delete: `<svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path></svg>`,
+  search: `<svg viewBox="0 0 24 24" class="search-icon-svg"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg>`,
+  profile: `<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`
+};
+
+// ===== UI HELPERS =====
 function toggleTheme() {
   isDarkMode = !isDarkMode;
   document.body.classList.toggle('dark-mode', isDarkMode);
   localStorage.setItem('quickcopy_dark_mode', isDarkMode);
 }
 
-// ===== TOAST SYSTEM =====
 function showToast(message, icon = '✅') {
   const container = document.getElementById('toast-container') || createToastContainer();
   const toast = document.createElement('div');
@@ -24,7 +55,6 @@ function showToast(message, icon = '✅') {
   container.appendChild(toast);
   setTimeout(() => {
     toast.style.opacity = '0';
-    toast.style.transform = 'translateX(-50%) translateY(20px)';
     setTimeout(() => toast.remove(), 300);
   }, 3000);
 }
@@ -37,30 +67,24 @@ function createToastContainer() {
   return div;
 }
 
-// ===== HELPERS =====
 function getSnippetType(text) {
   if (text.startsWith('http://') || text.startsWith('https://')) return 'link';
   if (text.includes('{') || text.includes('}') || text.includes('=>') || text.includes('const ') || text.includes('function')) return 'code';
   return 'text';
 }
 
-// ===== RENDER LOGIN =====
+// ===== RENDERERS =====
 function renderLogin() {
   document.getElementById('app').innerHTML = `
     <div class="auth-container">
       <h1>QuickCopy</h1>
       <p class="auth-subtitle">Your clipboard, everywhere.</p>
       <div class="glass-card">
-        <div class="input-group">
-          <input type="email" id="login-email" placeholder="Email" autocomplete="email" />
-        </div>
-        <div class="input-group">
-          <input type="password" id="login-password" placeholder="Password" autocomplete="current-password" />
-        </div>
+        <div class="input-group"><input type="email" id="login-email" placeholder="Email" autocomplete="email" /></div>
+        <div class="input-group"><input type="password" id="login-password" placeholder="Password" autocomplete="current-password" /></div>
         <button class="btn btn-primary" id="login-btn">Sign In</button>
         <button class="btn btn-outline" id="forgot-password">Forgot Password?</button>
         <button class="btn btn-outline" id="show-signup">Create New Account</button>
-        
         <div class="google-btn btn" id="google-signin-btn">
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" width="18" alt="G">
           <span>Continue with Google</span>
@@ -73,59 +97,40 @@ function renderLogin() {
   document.getElementById('login-btn').onclick = async () => {
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
-    if (!email || !password) return showError('Please fill in both fields.', 'login-error');
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch (err) {
-      showError(getFriendlyAuthError(err.code), 'login-error');
-    }
+    if (!email || !password) return showError('Fields required.', 'login-error');
+    try { await signInWithEmailAndPassword(auth, email, password); } 
+    catch (err) { showError(getFriendlyAuthError(err.code), 'login-error'); }
   };
 
   document.getElementById('forgot-password').onclick = showForgotPasswordModal;
   document.getElementById('show-signup').onclick = renderSignup;
   document.getElementById('google-signin-btn').onclick = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-    } catch (err) {
-      showError(getFriendlyAuthError(err.code), 'login-error');
-    }
+    try { await signInWithPopup(auth, new GoogleAuthProvider()); } 
+    catch (err) { showError(getFriendlyAuthError(err.code), 'login-error'); }
   };
 }
 
-// ===== FORGOT PASSWORD MODAL =====
 function showForgotPasswordModal() {
   document.getElementById('app').innerHTML = `
     <div class="auth-container">
       <h1>Reset</h1>
-      <p class="auth-subtitle">Enter email to receive reset link.</p>
+      <p class="auth-subtitle">Enter email for reset link.</p>
       <div class="glass-card">
-        <div class="input-group">
-          <input type="email" id="reset-email" placeholder="Email" />
-        </div>
+        <div class="input-group"><input type="email" id="reset-email" placeholder="Email" /></div>
         <button class="btn btn-primary" id="send-reset">Send Reset Link</button>
-        <button class="btn btn-outline" id="back-to-login">← Back to Sign In</button>
+        <button class="btn btn-outline" id="back-to-login">← Back</button>
         <div id="reset-error" class="error" style="display:none;"></div>
       </div>
     </div>
   `;
-
   document.getElementById('send-reset').onclick = async () => {
     const email = document.getElementById('reset-email').value.trim();
-    if (!email) return showError('Please enter your email.', 'reset-error');
-    try {
-      await sendPasswordResetEmail(auth, email);
-      showToast('Reset email sent! 📧');
-      renderLogin();
-    } catch (err) {
-      showError(getFriendlyAuthError(err.code), 'reset-error');
-    }
+    try { await sendPasswordResetEmail(auth, email); showToast('Email sent! 📧'); renderLogin(); } 
+    catch (err) { showError(getFriendlyAuthError(err.code), 'reset-error'); }
   };
-
   document.getElementById('back-to-login').onclick = renderLogin;
 }
 
-// ===== SIGNUP =====
 function renderSignup() {
   document.getElementById('app').innerHTML = `
     <div class="auth-container">
@@ -137,57 +142,38 @@ function renderSignup() {
         <input type="password" id="signup-password" placeholder="Password (8+ chars)" style="margin-bottom:12px;" />
         <input type="password" id="signup-confirm" placeholder="Confirm Password" style="margin-bottom:20px;" />
         <button class="btn btn-primary" id="signup-btn">Create Account</button>
-        <button class="btn btn-outline" id="back-to-login">Already have an account? Sign In</button>
+        <button class="btn btn-outline" id="back-to-login">Already have an account?</button>
         <div id="signup-error" class="error" style="display:none;"></div>
       </div>
     </div>
   `;
-
   document.getElementById('signup-btn').onclick = async () => {
     const name = document.getElementById('signup-name').value.trim();
     const email = document.getElementById('signup-email').value.trim();
     const password = document.getElementById('signup-password').value;
-    const confirm = document.getElementById('signup-confirm').value;
-
-    if (!name || !email || !password) return showError('Please fill all fields.', 'signup-error');
-    if (password.length < 8) return showError('Password too short (8+ chars).', 'signup-error');
-    if (password !== confirm) return showError('Passwords do not match.', 'signup-error');
-
+    if (password !== document.getElementById('signup-confirm').value) return showError('Passwords mismatch.', 'signup-error');
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      await addDoc(collection(db, 'users'), {
-        uid: userCredential.user.uid,
-        name: name,
-        email: email,
-        createdAt: new Date().toISOString()
-      });
-    } catch (err) {
-      showError(getFriendlyAuthError(err.code), 'signup-error');
-    }
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      await addDoc(collection(db, 'users'), { uid: cred.user.uid, name, email, createdAt: new Date().toISOString() });
+    } catch (err) { showError(getFriendlyAuthError(err.code), 'signup-error'); }
   };
-
   document.getElementById('back-to-login').onclick = renderLogin;
 }
 
-// ===== MAIN APP =====
 function renderApp() {
   const displayName = currentUser.email.split('@')[0];
-  
-  // Filter snippets based on search
-  filteredSnippets = snippets.filter(s => 
-    s.text.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  filteredSnippets = snippets.filter(s => s.text.toLowerCase().includes(searchTerm.toLowerCase()));
 
   document.getElementById('app').innerHTML = `
     <div class="header">
       <h2 style="font-weight:800;font-size:1.5rem;">Hello, ${displayName}</h2>
       <div class="profile-dropdown">
-        <button class="profile-btn" id="profile-btn">👤</button>
+        <button class="profile-btn" id="profile-btn">${ICONS.profile}</button>
         <div class="dropdown-menu" id="dropdown-menu" style="display:none;">
-          <button class="dropdown-item" id="view-profile"><span>👤</span> Profile</button>
-          <button class="dropdown-item" id="toggle-theme"><span>${isDarkMode ? '☀️' : '🌙'}</span> ${isDarkMode ? 'Light' : 'Dark'} Mode</button>
-          <button class="dropdown-item danger" id="delete-account"><span>🗑️</span> Delete Account</button>
-          <button class="dropdown-item" id="sign-out"><span>🚪</span> Sign Out</button>
+          <button class="dropdown-item" id="view-profile">Profile</button>
+          <button class="dropdown-item" id="toggle-theme">${isDarkMode ? '☀️' : '🌙'} ${isDarkMode ? 'Light' : 'Dark'} Mode</button>
+          <button class="dropdown-item danger" id="delete-account">Delete Account</button>
+          <button class="dropdown-item" id="sign-out">Sign Out</button>
         </div>
       </div>
     </div>
@@ -195,12 +181,12 @@ function renderApp() {
     <div class="glass-card" style="padding: 16px; margin-bottom: 24px;">
       <div id="input-area" style="display:flex; gap:12px;">
         <input type="text" id="new-snippet" placeholder="Paste anything here..." autocomplete="off" style="margin:0;"/>
-        <button id="add-btn" class="btn-primary" style="padding:0 20px; border-radius:14px; border:none; cursor:pointer; font-weight:600;">Add</button>
+        <button id="add-btn" class="btn btn-primary" style="width:auto; padding:0 20px;">Add</button>
       </div>
     </div>
 
     <div class="search-container">
-      <span class="search-icon">🔍</span>
+      ${ICONS.search}
       <input type="text" id="search-input" placeholder="Search your clips..." value="${searchTerm}" />
     </div>
 
@@ -215,12 +201,12 @@ function renderApp() {
                 <div class="snippet-content">${escapeHtml(item.text)}</div>
                 <div class="snippet-footer">
                   <div class="actions-group">
-                    <button class="icon-btn copy-btn" data-index="${i}" title="Copy">📋</button>
-                    <button class="icon-btn pin-btn ${item.pinned ? 'active' : ''}" data-id="${item.id}" data-pinned="${item.pinned}" title="Pin">📌</button>
+                    <button class="icon-btn copy-btn" data-index="${i}">${ICONS.copy}</button>
+                    <button class="icon-btn pin-btn ${item.pinned ? 'active' : ''}" data-id="${item.id}" data-pinned="${item.pinned}">${ICONS.pin}</button>
                   </div>
                   <div class="actions-group">
-                    <button class="icon-btn edit-btn" data-id="${item.id}" data-text="${escapeHtml(item.text)}" title="Edit">✏️</button>
-                    <button class="icon-btn delete-btn" data-id="${item.id}" title="Delete">🗑️</button>
+                    <button class="icon-btn edit-btn" data-id="${item.id}" data-text="${escapeHtml(item.text)}">${ICONS.edit}</button>
+                    <button class="icon-btn delete-btn" data-id="${item.id}">${ICONS.delete}</button>
                   </div>
                 </div>
               </div>
@@ -242,170 +228,84 @@ function renderApp() {
   document.getElementById('add-btn').onclick = addSnippet;
   document.getElementById('new-snippet').onkeypress = (e) => { if (e.key === 'Enter') addSnippet(); };
 
-  // Search Logic
   const searchInput = document.getElementById('search-input');
-  searchInput.oninput = (e) => {
-    searchTerm = e.target.value;
-    renderApp();
-    document.getElementById('search-input').focus(); // Keep focus
-  };
+  searchInput.oninput = (e) => { searchTerm = e.target.value; renderApp(); document.getElementById('search-input').focus(); };
 
-  // Snippet Actions
   document.querySelectorAll('.copy-btn').forEach(btn => {
-    btn.onclick = () => {
-      const idx = btn.dataset.index;
-      navigator.clipboard.writeText(filteredSnippets[idx].text);
-      showToast('Copied to clipboard! 📋');
-    };
+    btn.onclick = () => { navigator.clipboard.writeText(filteredSnippets[btn.dataset.index].text); showToast('Copied! 📋'); };
   });
-
-  document.querySelectorAll('.pin-btn').forEach(btn => {
-    btn.onclick = () => togglePin(btn.dataset.id, btn.dataset.pinned === 'true');
-  });
-
-  document.querySelectorAll('.edit-btn').forEach(btn => {
-    btn.onclick = () => editSnippet(btn.dataset.id, btn.dataset.text);
-  });
-
-  document.querySelectorAll('.delete-btn').forEach(btn => {
-    btn.onclick = () => deleteSnippet(btn.dataset.id);
-  });
+  document.querySelectorAll('.pin-btn').forEach(btn => { btn.onclick = () => togglePin(btn.dataset.id, btn.dataset.pinned === 'true'); });
+  document.querySelectorAll('.edit-btn').forEach(btn => { btn.onclick = () => editSnippet(btn.dataset.id, btn.dataset.text); });
+  document.querySelectorAll('.delete-btn').forEach(btn => { btn.onclick = () => deleteSnippet(btn.dataset.id); });
 }
 
-// ===== SNIPPET ACTIONS =====
-async function addSnippet() {
-  const input = document.getElementById('new-snippet');
-  const val = input.value.trim();
-  if (!val) return;
-  try {
-    await addDoc(collection(db, 'snippets'), {
-      text: val,
-      userId: currentUser.uid,
-      pinned: false,
-      createdAt: new Date().toISOString()
-    });
-    input.value = '';
-    showToast('Snippet added! ✨');
-    loadSnippets();
-  } catch (e) { showToast('Error adding snippet.', '❌'); }
-}
-
-async function togglePin(id, currentStatus) {
-  try {
-    await updateDoc(doc(db, 'snippets', id), { pinned: !currentStatus });
-    loadSnippets();
-  } catch (e) { showToast('Error pinning.', '❌'); }
-}
-
-async function editSnippet(id, oldText) {
-  const newText = prompt('Edit clip:', oldText);
-  if (newText === null || newText.trim() === '') return;
-  try {
-    await updateDoc(doc(db, 'snippets', id), { text: newText.trim() });
-    showToast('Updated! ✏️');
-    loadSnippets();
-  } catch (e) { showToast('Update failed.', '❌'); }
-}
-
-async function deleteSnippet(id) {
-  if (!confirm('Delete forever?')) return;
-  try {
-    await deleteDoc(doc(db, 'snippets', id));
-    showToast('Deleted. 🗑️');
-    loadSnippets();
-  } catch (e) { showToast('Delete failed.', '❌'); }
-}
-
-// ===== PROFILE =====
-async function showProfile() {
-  const user = auth.currentUser;
-  let name = user.email.split('@')[0];
-  const snap = await getDocs(query(collection(db, 'users'), where('uid', '==', user.uid)));
-  if (!snap.empty) name = snap.docs[0].data().name;
-
+function showProfile() {
   document.getElementById('app').innerHTML = `
     <div class="header">
       <button class="icon-btn" id="back-to-app" style="width:auto; padding:0 12px;">← Back</button>
-      <h2 style="font-weight:800;">Profile</h2>
+      <h2 style="font-weight:800;">Settings</h2>
+    </div>
+    <div class="glass-card">
+      <h3 style="margin-bottom:16px;">Appearance</h3>
+      <p style="color:var(--text-dim); margin-bottom:12px; font-size:0.9rem;">Choose your signature color:</p>
+      <div class="palette-grid">
+        ${palettes.map(p => `
+          <div class="palette-swatch ${activePalette.name === p.name ? 'active' : ''}" 
+               style="background: linear-gradient(135deg, ${p.primary}, ${p.secondary})"
+               onclick="window.setPaletteByName('${p.name}')"></div>
+        `).join('')}
+      </div>
     </div>
     <div class="glass-card" style="text-align:center;">
-      <div style="font-size:4rem; margin-bottom:16px;">👤</div>
-      <h2 style="margin-bottom:4px;">${name}</h2>
-      <p style="color:var(--text-dim); margin-bottom:24px;">${user.email}</p>
-      
-      <div style="text-align:left; background:rgba(0,0,0,0.1); padding:16px; border-radius:14px; font-size:0.9rem;">
-        <p style="margin-bottom:8px;"><strong>Account UID:</strong><br>${user.uid}</p>
-        <p><strong>Member Since:</strong><br>${new Date(user.metadata.creationTime).toLocaleDateString()}</p>
-      </div>
+      <p style="color:var(--text-dim);">Logged in as<br><strong>${currentUser.email}</strong></p>
     </div>
   `;
   document.getElementById('back-to-app').onclick = renderApp;
 }
 
-// ===== ACCOUNT MANAGEMENT =====
-function confirmDeleteAccount() {
-  if (!confirm('⚠️ Wipe ALL data and delete account permanently?')) return;
-  deleteUser(auth.currentUser).then(async () => {
-    const q = query(collection(db, 'snippets'), where('userId', '==', currentUser.uid));
-    const snap = await getDocs(q);
-    const promises = [];
-    snap.forEach(d => promises.push(deleteDoc(d.ref)));
-    await Promise.all(promises);
-    currentUser = null;
-    renderLogin();
-  }).catch(e => showToast('Failed to delete account.', '❌'));
-}
+window.setPaletteByName = (name) => {
+  const p = palettes.find(pal => pal.name === name);
+  if (p) { applyPalette(p); showProfile(); }
+};
 
-// ===== INIT & LOAD =====
-async function loadSnippets() {
+// ===== ACTIONS =====
+async function addSnippet() {
+  const input = document.getElementById('new-snippet');
+  if (!input.value.trim()) return;
   try {
-    const q = query(collection(db, 'snippets'), where('userId', '==', currentUser.uid));
-    const snap = await getDocs(q);
-    snippets = [];
-    snap.forEach(d => snippets.push({ id: d.id, ...d.data() }));
-    
-    // Sort: Pinned first, then by date
-    snippets.sort((a, b) => {
-      if (a.pinned === b.pinned) return new Date(b.createdAt) - new Date(a.createdAt);
-      return a.pinned ? -1 : 1;
-    });
-    
-    renderApp();
-  } catch (e) { showToast('Error loading snippets.', '❌'); }
+    await addDoc(collection(db, 'snippets'), { text: input.value.trim(), userId: currentUser.uid, pinned: false, createdAt: new Date().toISOString() });
+    input.value = ''; showToast('Added! ✨'); loadSnippets();
+  } catch (e) { showToast('Error.', '❌'); }
 }
 
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
+async function togglePin(id, current) {
+  try { await updateDoc(doc(db, 'snippets', id), { pinned: !current }); loadSnippets(); } catch (e) { showToast('Error.', '❌'); }
 }
 
-function showError(msg, id) {
-  const el = document.getElementById(id);
-  if (el) {
-    el.textContent = msg;
-    el.style.display = 'block';
-    setTimeout(() => el.style.display = 'none', 4000);
-  }
+async function editSnippet(id, old) {
+  const res = prompt('Edit clip:', old);
+  if (res) { await updateDoc(doc(db, 'snippets', id), { text: res.trim() }); showToast('Updated!'); loadSnippets(); }
 }
 
-function getFriendlyAuthError(code) {
-  switch (code) {
-    case 'auth/invalid-email': return 'Invalid email.';
-    case 'auth/user-not-found': return 'Account not found.';
-    case 'auth/wrong-password': return 'Incorrect password.';
-    case 'auth/email-already-in-use': return 'Email already registered.';
-    case 'auth/weak-password': return 'Password too weak.';
-    default: return 'Something went wrong.';
-  }
+async function deleteSnippet(id) {
+  if (confirm('Delete?')) { await deleteDoc(doc(db, 'snippets', id)); showToast('Deleted.'); loadSnippets(); }
 }
 
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    currentUser = user;
-    loadSnippets();
-  } else {
-    currentUser = null;
-    renderLogin();
-  }
-});
+async function loadSnippets() {
+  const q = query(collection(db, 'snippets'), where('userId', '==', currentUser.uid));
+  const snap = await getDocs(q);
+  snippets = [];
+  snap.forEach(d => snippets.push({ id: d.id, ...d.data() }));
+  snippets.sort((a, b) => a.pinned === b.pinned ? new Date(b.createdAt) - new Date(a.createdAt) : (a.pinned ? -1 : 1));
+  renderApp();
+}
+
+function confirmDeleteAccount() {
+  if (confirm('Wipe everything?')) deleteUser(auth.currentUser).then(renderLogin);
+}
+
+function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+function showError(m, i) { const e = document.getElementById(i); if (e) { e.textContent = m; e.style.display = 'block'; setTimeout(() => e.style.display = 'none', 4000); } }
+function getFriendlyAuthError(c) { return c.replace('auth/', '').replace(/-/g, ' '); }
+
+onAuthStateChanged(auth, (u) => { if (u) { currentUser = u; loadSnippets(); } else { currentUser = null; renderLogin(); } });
