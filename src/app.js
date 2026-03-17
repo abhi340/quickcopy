@@ -17,7 +17,7 @@ let searchTerm = '';
 let currentView = 'active'; // active, archived, trash
 let currentTag = 'all'; // all, #Link, #Code
 let selectedIdx = -1; // Vim-style navigation
-let hasRendered = false; // Prevent multiple renders
+let currentActivePage = ''; // dashboard, login, loading
 
 function highlightSearch(text, term) {
   if (!term || term.length < 2) return text;
@@ -27,7 +27,6 @@ function highlightSearch(text, term) {
 
 // Load Marked.js & DOMPurify
 function loadExternalScripts() {
-  console.log("📦 Loading external scripts...");
   if (!document.getElementById('marked-js')) {
     const s = document.createElement('script');
     s.id = 'marked-js';
@@ -43,13 +42,22 @@ function loadExternalScripts() {
 }
 loadExternalScripts();
 
+// ===== UI STATE CONTROLLER =====
+function clearApp() {
+  const app = document.getElementById('app');
+  if (app) app.innerHTML = '';
+}
+
 // ===== AUTH RENDERERS =====
 function renderLogin() {
+  if (currentActivePage === 'login') return;
+  currentActivePage = 'login';
   console.log("🔑 Rendering Login Screen...");
+  
+  clearApp();
   const appEl = document.getElementById('app');
   if (!appEl) return;
   
-  hasRendered = false; // Reset on logout
   appEl.innerHTML = `
     <div class="landing-layout">
       <div class="landing-hero">
@@ -80,7 +88,7 @@ function renderLogin() {
         </div>
       </div>
       <div class="landing-auth">
-        <div class="auth-container" style="margin: 0; max-width: 100%; width: 100%;">
+        <div class="auth-container">
           <div class="glass-card">
             <h2>Welcome Back</h2>
             <input type="email" id="login-email" placeholder="Email" autocomplete="email" />
@@ -111,15 +119,10 @@ function renderLogin() {
   document.getElementById('forgot-password-btn').onclick = showForgotPasswordModal;
   document.getElementById('show-signup-btn').onclick = renderSignup;
   document.getElementById('google-signin-btn').onclick = async () => {
-    console.log("🚀 Attempting Google Sign-In...");
     try { 
       const provider = new GoogleAuthProvider();
-      // Optional: Add custom parameters if needed
-      // provider.setCustomParameters({ prompt: 'select_account' });
       await signInWithPopup(auth, provider); 
-      console.log("✅ Google Sign-In Successful!");
     } catch (err) { 
-      console.error("❌ Google Auth Error:", err.code, err.message);
       if (err.code === 'auth/unauthorized-domain') {
         alert("🔒 UNAUTHORIZED DOMAIN: Please add " + window.location.hostname + " to your Firebase Authorized Domains list.");
       }
@@ -129,8 +132,9 @@ function renderLogin() {
 }
 
 function showForgotPasswordModal() {
+  clearApp();
   document.getElementById('app').innerHTML = `
-    <div class="auth-container">
+    <div class="auth-container" style="margin-top: 100px;">
       <h1>Reset</h1>
       <p class="auth-subtitle">Enter email for reset link.</p>
       <div class="glass-card">
@@ -143,15 +147,16 @@ function showForgotPasswordModal() {
   `;
   document.getElementById('send-reset').onclick = async () => {
     const email = document.getElementById('reset-email').value.trim();
-    try { await sendPasswordResetEmail(auth, email); showToast('Email sent! 📧'); renderLogin(); } 
+    try { await sendPasswordResetEmail(auth, email); showToast('Email sent! 📧'); currentActivePage = ''; renderLogin(); } 
     catch (err) { showError(getFriendlyAuthError(err.code), 'reset-error'); }
   };
-  document.getElementById('back-to-login').onclick = renderLogin;
+  document.getElementById('back-to-login').onclick = () => { currentActivePage = ''; renderLogin(); };
 }
 
 function renderSignup() {
+  clearApp();
   document.getElementById('app').innerHTML = `
-    <div class="auth-container">
+    <div class="auth-container" style="margin-top: 100px;">
       <h1>Join Us</h1>
       <p class="auth-subtitle">Start syncing in seconds.</p>
       <div class="glass-card">
@@ -175,15 +180,16 @@ function renderSignup() {
       await addDoc(collection(db, 'users'), { uid: cred.user.uid, name, email, createdAt: new Date().toISOString() });
     } catch (err) { showError(getFriendlyAuthError(err.code), 'signup-error'); }
   };
-  document.getElementById('back-to-login-signup').onclick = renderLogin;
+  document.getElementById('back-to-login-signup').onclick = () => { currentActivePage = ''; renderLogin(); };
 }
 
 // ===== MAIN APP RENDERER =====
 function renderApp() {
   if (!currentUser) return;
-  if (hasRendered) return;
-  hasRendered = true;
+  if (currentActivePage === 'dashboard') return;
+  currentActivePage = 'dashboard';
   
+  clearApp();
   const initialName = currentUser.email ? currentUser.email.split('@')[0] : 'User';
   const safeDisplayName = escapeHtml(initialName);
   const safeSearchTerm = escapeHtml(searchTerm);
@@ -242,10 +248,8 @@ function renderApp() {
     </footer>
   `;
 
-  // Asynchronously fetch real display name
   fetchUserDisplayName();
 
-  // Attach persistent header events
   const profileBtn = document.getElementById('profile-btn');
   const dropdown = document.getElementById('dropdown-menu');
   const searchInput = document.getElementById('search-input');
@@ -273,13 +277,16 @@ function renderApp() {
   document.getElementById('toggle-theme-btn').onclick = (e) => {
     e.stopPropagation();
     toggleTheme();
-    hasRendered = false; // Reset to allow re-render with new theme text
+    currentActivePage = ''; // Force re-render for text update
     renderApp(); 
   };
 
-  document.getElementById('sign-out-btn').onclick = () => signOut(auth);
-  document.getElementById('delete-account-btn').onclick = confirmDeleteAccount;
+  document.getElementById('sign-out-btn').onclick = () => {
+    currentActivePage = '';
+    signOut(auth);
+  };
   
+  document.getElementById('delete-account-btn').onclick = confirmDeleteAccount;
   document.getElementById('add-btn').onclick = addSnippet;
   document.getElementById('new-snippet').onkeypress = (e) => { if (e.key === 'Enter') addSnippet(); };
 
@@ -300,14 +307,13 @@ async function fetchUserDisplayName() {
       const el = document.getElementById('header-user-name');
       if (el) el.textContent = escapeHtml(name);
     }
-  } catch (err) { console.warn("Failed to fetch display name", err); }
+  } catch (err) {}
 }
 
 function renderSnippets() {
   const container = document.getElementById('snippets-list-container');
   if (!container) return;
 
-  // Update active states
   const vActive = document.getElementById('view-active');
   const vArchived = document.getElementById('view-archived');
   const vTrash = document.getElementById('view-trash');
@@ -348,7 +354,7 @@ function renderSnippets() {
   container.innerHTML = `
     <div id="snippets-list">
       ${filteredSnippets.length === 0 
-        ? `<div class="glass-card empty-state">No clips found. ${searchTerm || currentTag !== 'all' ? 'Try changing filters.' : 'Add your first one!'}</div>` 
+        ? `<div class="glass-card empty-state" style="text-align:center; color:var(--text-dim);">No clips found.</div>` 
         : filteredSnippets.map((item, i) => {
             const type = getSnippetType(item.text);
             const isTrash = item.status === 'trash';
@@ -364,9 +370,9 @@ function renderSnippets() {
                 const domain = urlObj.hostname;
                 richMediaHtml = `
                   <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding: 12px; background: var(--glass); border-radius: 12px; border: 1px solid var(--glass-border);">
-                    <img src="https://s2.googleusercontent.com/s2/favicons?domain=${domain}&sz=32" style="width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;" onerror="this.style.display='none'" />
+                    <img src="https://s2.googleusercontent.com/s2/favicons?domain=${domain}&sz=32" style="width: 32px; height: 32px; border-radius: 8px;" onerror="this.style.display='none'" />
                     <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; flex: 1;">
-                      <a href="${item.text}" target="_blank" style="color: var(--primary); text-decoration: none; display: block; overflow: hidden; text-overflow: ellipsis;">Visit ${domain} <span style="font-size: 0.8rem; margin-left: 4px;">↗</span></a>
+                      <a href="${item.text}" target="_blank" style="color: var(--primary); text-decoration: none;">Visit ${domain} ↗</a>
                     </div>
                   </div>
                 `;
@@ -377,38 +383,33 @@ function renderSnippets() {
               try {
                 const rawHtml = marked.parse(item.text);
                 contentHtml = DOMPurify.sanitize(rawHtml);
-                if (searchTerm && searchTerm.length >= 2) {
-                   contentHtml = highlightSearch(contentHtml, searchTerm);
-                }
-              } catch (e) { console.error("MD Error", e); }
+                if (searchTerm && searchTerm.length >= 2) contentHtml = highlightSearch(contentHtml, searchTerm);
+              } catch (e) {}
             }
 
             return `
-              <div class="snippet-card ${item.pinned ? 'pinned' : ''} ${selectedIdx === i ? 'selected' : ''}" data-index="${i}" title="Click to copy">
+              <div class="snippet-card ${item.pinned ? 'pinned' : ''} ${selectedIdx === i ? 'selected' : ''}" data-index="${i}">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                   <div style="display: flex; gap: 4px; flex-wrap: wrap;">
                     <span class="badge badge-${type}">${type}</span>
-                    ${(item.tags || []).map(t => `<span class="badge ${t === '#Link' ? 'badge-link' : (t === '#Code' ? 'badge-code' : 'badge-text')}" style="opacity: 0.8; font-weight: 500;">${t}</span>`).join('')}
+                    ${(item.tags || []).map(t => `<span class="badge ${t === '#Link' ? 'badge-link' : (t === '#Code' ? 'badge-code' : 'badge-text')}" style="opacity: 0.8;">${t}</span>`).join('')}
                   </div>
                   <div style="display: flex; gap: 4px;">
                     ${item.isPublic ? '<span class="badge badge-link" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">Public</span>' : ''}
                     ${isMarkdown ? '<span class="badge badge-code" style="background: rgba(99, 102, 241, 0.15); color: #818cf8;">MD</span>' : ''}
                   </div>
                 </div>
-                <div class="snippet-content">
-                  ${richMediaHtml}
-                  ${contentHtml}
-                </div>
+                <div class="snippet-content">${richMediaHtml}${contentHtml}</div>
                 <div class="snippet-footer">
                   <div class="actions-group">
                     ${!isTrash ? `
                       <button class="icon-btn pin-btn ${item.pinned ? 'active' : ''}" data-id="${item.id}" data-pinned="${item.pinned}" title="Pin">${ICONS.pin}</button>
-                      <button class="icon-btn share-btn" data-id="${item.id}" data-public="${item.isPublic || false}" title="Public Share">${ICONS.share}</button>
-                      <button class="icon-btn md-btn ${isMarkdown ? 'active' : ''}" data-id="${item.id}" data-md="${isMarkdown}" title="Toggle Markdown">${ICONS.markdown}</button>
+                      <button class="icon-btn share-btn" data-id="${item.id}" data-public="${item.isPublic || false}" title="Share">${ICONS.share}</button>
+                      <button class="icon-btn md-btn ${isMarkdown ? 'active' : ''}" data-id="${item.id}" data-md="${isMarkdown}" title="Markdown">${ICONS.markdown}</button>
                       <button class="icon-btn edit-btn" data-id="${item.id}" data-text="${escapeHtml(item.text)}" title="Edit">${ICONS.edit}</button>
                       <button class="icon-btn archive-btn" data-id="${item.id}" data-status="${item.status || 'active'}" title="${isArchived ? 'Unarchive' : 'Archive'}">${ICONS.archive}</button>
                     ` : ''}
-                    <button class="icon-btn delete-btn" data-id="${item.id}" data-status="${item.status || 'active'}" title="${isTrash ? 'Permanently Delete' : 'Move to Trash'}">${ICONS.delete}</button>
+                    <button class="icon-btn delete-btn" data-id="${item.id}" data-status="${item.status || 'active'}" title="Delete">${ICONS.delete}</button>
                     ${isTrash ? `<button class="icon-btn restore-btn" data-id="${item.id}" title="Restore">${ICONS.restore}</button>` : ''}
                     <button class="icon-btn copy-btn" data-index="${i}" title="Copy">${ICONS.copy}</button>
                   </div>
@@ -419,13 +420,13 @@ function renderSnippets() {
     </div>
   `;
 
-  // Attach card-specific events
+  // Attach card events
   document.querySelectorAll('.snippet-card').forEach(card => {
     card.onclick = (e) => {
       if (e.target.closest('.icon-btn')) return;
       const idx = card.dataset.index;
       navigator.clipboard.writeText(filteredSnippets[idx].text);
-      showToast('Copied to clipboard! 📋');
+      showToast('Copied! 📋');
     };
   });
 
@@ -439,84 +440,54 @@ function renderSnippets() {
   document.querySelectorAll('.restore-btn').forEach(btn => { btn.onclick = (e) => { e.stopPropagation(); updateStatus(btn.dataset.id, 'active'); }; });
 }
 
-// ===== FIREBASE ACTIONS =====
+// ===== ACTIONS =====
 async function addSnippet() {
   const input = document.getElementById('new-snippet');
   const val = input.value.trim();
   if (!val) return;
-
   const type = getSnippetType(val);
-  const tags = [];
-  if (type === 'link') tags.push('#Link');
-  if (type === 'code') tags.push('#Code');
-
+  const tags = type === 'link' ? ['#Link'] : (type === 'code' ? ['#Code'] : []);
   try {
-    await addDoc(collection(db, 'snippets'), { 
-      text: val, 
-      userId: currentUser.uid, 
-      pinned: false, 
-      status: 'active',
-      isPublic: false,
-      isMarkdown: false,
-      tags: tags,
-      createdAt: new Date().toISOString() 
-    });
+    await addDoc(collection(db, 'snippets'), { text: val, userId: currentUser.uid, pinned: false, status: 'active', isPublic: false, isMarkdown: false, tags, createdAt: new Date().toISOString() });
     input.value = ''; 
-    showToast('Added to Cloud! ✨'); 
+    showToast('Synced! ✨'); 
     loadSnippets();
-  } catch (e) { showToast('Cloud Error.', '❌'); }
+  } catch (e) { showToast('Sync failed.', '❌'); }
 }
 
 async function togglePin(id, current) {
-  try { await updateDoc(doc(db, 'snippets', id), { pinned: !current }); loadSnippets(); } 
-  catch (e) { showToast('Update Error.', '❌'); }
+  try { await updateDoc(doc(db, 'snippets', id), { pinned: !current }); loadSnippets(); } catch (e) {}
 }
 
 async function togglePublic(id, current) {
   try { 
     await updateDoc(doc(db, 'snippets', id), { isPublic: !current }); 
     if (!current) {
-      const baseUrl = window.location.href.split('?')[0].split('#')[0];
-      const shareUrl = new URL(`public.html?id=${id}`, baseUrl).href;
+      const shareUrl = new URL(`public.html?id=${id}`, window.location.href.split('?')[0].split('#')[0]).href;
       navigator.clipboard.writeText(shareUrl);
-      showToast('Public link copied! 🔗');
-    } else {
-      showToast('Link disabled.');
-    }
+      showToast('Link copied! 🔗');
+    } else { showToast('Link disabled.'); }
     loadSnippets(); 
-  } catch (e) { showToast('Sharing Error.', '❌'); }
+  } catch (e) {}
 }
 
 async function toggleMarkdown(id, current) {
-  try { await updateDoc(doc(db, 'snippets', id), { isMarkdown: !current }); loadSnippets(); } 
-  catch (e) { showToast('MD Error.', '❌'); }
+  try { await updateDoc(doc(db, 'snippets', id), { isMarkdown: !current }); loadSnippets(); } catch (e) {}
 }
 
 async function updateStatus(id, newStatus) {
-  try { await updateDoc(doc(db, 'snippets', id), { status: newStatus }); loadSnippets(); } 
-  catch (e) { showToast('Status Error.', '❌'); }
+  try { await updateDoc(doc(db, 'snippets', id), { status: newStatus }); loadSnippets(); } catch (e) {}
 }
 
 async function handleDeletion(id, currentStatus) {
   if (currentStatus === 'trash') {
-    if (confirm('Permanently delete from cloud?')) { 
-      await deleteDoc(doc(db, 'snippets', id)); 
-      showToast('Wiped from Cloud.'); 
-      loadSnippets(); 
-    }
-  } else {
-    await updateStatus(id, 'trash');
-    showToast('Moved to Trash.');
-  }
+    if (confirm('Permanently delete?')) { await deleteDoc(doc(db, 'snippets', id)); showToast('Wiped.'); loadSnippets(); }
+  } else { await updateStatus(id, 'trash'); showToast('Moved to Trash.'); }
 }
 
 async function editSnippet(id, old) {
   const res = prompt('Edit clip:', old);
-  if (res && res.trim()) { 
-    await updateDoc(doc(db, 'snippets', id), { text: res.trim() }); 
-    showToast('Cloud Sync Updated!'); 
-    loadSnippets(); 
-  }
+  if (res && res.trim()) { await updateDoc(doc(db, 'snippets', id), { text: res.trim() }); showToast('Updated!'); loadSnippets(); }
 }
 
 async function loadSnippets() {
@@ -527,74 +498,35 @@ async function loadSnippets() {
     snippets = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     snippets.sort((a, b) => a.pinned === b.pinned ? new Date(b.createdAt) - new Date(a.createdAt) : (a.pinned ? -1 : 1));
     renderSnippets();
-  } catch (e) { console.error("Snippets load error", e); }
+  } catch (e) {}
 }
 
 function confirmDeleteAccount() {
-  if (confirm('DANGER: Wipe ALL cloud data and delete account?')) {
-    deleteUser(auth.currentUser).then(() => { window.location.reload(); }).catch(e => showError("Failed to delete account."));
+  if (confirm('DANGER: Delete ALL data and account?')) {
+    deleteUser(auth.currentUser).then(() => { window.location.reload(); }).catch(e => showError("Failed."));
   }
 }
 
-// ===== KEYBOARD SHORTCUTS =====
+// ===== KEYBOARD =====
 document.addEventListener('keydown', (e) => {
-  if (e.ctrlKey && e.key === 'Enter') {
-    if (document.activeElement.id === 'new-snippet') addSnippet();
+  if (e.ctrlKey && e.key === 'Enter' && document.activeElement.id === 'new-snippet') addSnippet();
+  if ((e.ctrlKey && e.key === 'f') || e.key === '/') {
+    if (document.activeElement.tagName !== 'INPUT') { e.preventDefault(); document.getElementById('search-input')?.focus(); }
   }
-  
-  // Power User Search
-  if (e.ctrlKey && e.key === 'f' || e.key === '/') {
-    if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
-      e.preventDefault();
-      document.getElementById('search-input')?.focus();
-    }
+  if (document.activeElement.tagName !== 'INPUT') {
+    if (e.key === 'j') { e.preventDefault(); selectedIdx = Math.min(selectedIdx + 1, filteredSnippets.length - 1); renderSnippets(); document.querySelector(`[data-index="${selectedIdx}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    if (e.key === 'k') { e.preventDefault(); selectedIdx = Math.max(selectedIdx - 1, 0); renderSnippets(); document.querySelector(`[data-index="${selectedIdx}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    if (e.key === 'y' && selectedIdx !== -1) { navigator.clipboard.writeText(filteredSnippets[selectedIdx].text); showToast('Copied! 📋'); }
   }
-
-  // Vim-style Navigation
-  if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
-    if (e.key === 'j') {
-      e.preventDefault();
-      selectedIdx = Math.min(selectedIdx + 1, filteredSnippets.length - 1);
-      renderSnippets();
-      document.querySelector(`[data-index="${selectedIdx}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    if (e.key === 'k') {
-      e.preventDefault();
-      selectedIdx = Math.max(selectedIdx - 1, 0);
-      renderSnippets();
-      document.querySelector(`[data-index="${selectedIdx}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    if (e.key === 'y' && selectedIdx !== -1) {
-      navigator.clipboard.writeText(filteredSnippets[selectedIdx].text);
-      showToast(`Copied snippet #${selectedIdx + 1} 📋`);
-    }
-  }
-
   if (e.altKey && e.key >= '1' && e.key <= '9') {
     const idx = parseInt(e.key) - 1;
-    if (filteredSnippets[idx]) {
-      navigator.clipboard.writeText(filteredSnippets[idx].text);
-      showToast(`Snippet #${e.key} Copied! 📋`);
-    }
+    if (filteredSnippets[idx]) { navigator.clipboard.writeText(filteredSnippets[idx].text); showToast(`Snippet #${e.key} Copied!`); }
   }
-  if (e.key === 'Escape') {
-    searchTerm = '';
-    selectedIdx = -1;
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) searchInput.value = '';
-    if (document.activeElement.tagName === 'INPUT') document.activeElement.blur();
-    renderSnippets();
-  }
+  if (e.key === 'Escape') { searchTerm = ''; selectedIdx = -1; const si = document.getElementById('search-input'); if (si) si.value = ''; document.activeElement.blur(); renderSnippets(); }
 });
 
 // ===== INITIALIZATION =====
 onAuthStateChanged(auth, (u) => { 
-  if (u) { 
-    currentUser = u; 
-    renderApp(); 
-    loadSnippets(); 
-  } else { 
-    currentUser = null; 
-    renderLogin(); 
-  } 
+  if (u) { currentUser = u; renderApp(); loadSnippets(); } 
+  else { currentUser = null; currentActivePage = ''; renderLogin(); } 
 });
