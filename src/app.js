@@ -9,15 +9,22 @@ let filteredSnippets = [];
 let searchTerm = '';
 let currentView = 'active'; // active, archived, trash
 
-// Load Marked.js for Markdown support
-const script = document.createElement('script');
-script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
-document.head.appendChild(script);
-
-// Load DOMPurify for XSS protection
-const purifyScript = document.createElement('script');
-purifyScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js';
-document.head.appendChild(purifyScript);
+// Load Marked.js & DOMPurify
+function loadExternalScripts() {
+  if (!document.getElementById('marked-js')) {
+    const s = document.createElement('script');
+    s.id = 'marked-js';
+    s.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+    document.head.appendChild(s);
+  }
+  if (!document.getElementById('purify-js')) {
+    const s = document.createElement('script');
+    s.id = 'purify-js';
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js';
+    document.head.appendChild(s);
+  }
+}
+loadExternalScripts();
 
 // ===== AUTH RENDERERS =====
 function renderLogin() {
@@ -111,22 +118,16 @@ function renderSignup() {
 }
 
 // ===== MAIN APP RENDERER =====
-async function renderApp() {
+function renderApp() {
   if (!currentUser) return;
   
-  let displayName = currentUser.email ? currentUser.email.split('@')[0] : 'User';
-  try {
-    const q = query(collection(db, 'users'), where('uid', '==', currentUser.uid));
-    const snap = await getDocs(q);
-    if (!snap.empty) displayName = snap.docs[0].data().name || displayName;
-  } catch (err) {}
-
-  const safeDisplayName = escapeHtml(displayName);
+  const initialName = currentUser.email ? currentUser.email.split('@')[0] : 'User';
+  const safeDisplayName = escapeHtml(initialName);
   const safeSearchTerm = escapeHtml(searchTerm);
 
   document.getElementById('app').innerHTML = `
     <div class="header">
-      <div class="user-greeting">Hello, ${safeDisplayName}</div>
+      <div class="user-greeting">Hello, <span id="header-user-name">${safeDisplayName}</span></div>
       <div class="header-search-container">
         ${ICONS.search}
         <input type="text" id="search-input" placeholder="Search clips..." value="${safeSearchTerm}" />
@@ -164,7 +165,7 @@ async function renderApp() {
     </div>
 
     <div id="snippets-list-container">
-      <!-- Snippets will be injected here -->
+      <div style="text-align:center; padding:40px; color:var(--text-dim);">Loading your clips...</div>
     </div>
 
     <footer class="app-footer">
@@ -176,6 +177,9 @@ async function renderApp() {
       <p>&copy; 2026 QuickCopy Pro. All rights reserved.</p>
     </footer>
   `;
+
+  // Asynchronously fetch real display name
+  fetchUserDisplayName();
 
   // Attach persistent header events
   const profileBtn = document.getElementById('profile-btn');
@@ -223,14 +227,30 @@ async function renderApp() {
   renderSnippets();
 }
 
+async function fetchUserDisplayName() {
+  try {
+    const q = query(collection(db, 'users'), where('uid', '==', currentUser.uid));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      const name = snap.docs[0].data().name;
+      const el = document.getElementById('header-user-name');
+      if (el) el.textContent = escapeHtml(name);
+    }
+  } catch (err) { console.warn("Failed to fetch display name", err); }
+}
+
 function renderSnippets() {
   const container = document.getElementById('snippets-list-container');
   if (!container) return;
 
   // Update active states
-  document.getElementById('view-active').classList.toggle('active', currentView === 'active');
-  document.getElementById('view-archived').classList.toggle('active', currentView === 'archived');
-  document.getElementById('view-trash').classList.toggle('active', currentView === 'trash');
+  const vActive = document.getElementById('view-active');
+  const vArchived = document.getElementById('view-archived');
+  const vTrash = document.getElementById('view-trash');
+  
+  if (vActive) vActive.classList.toggle('active', currentView === 'active');
+  if (vArchived) vArchived.classList.toggle('active', currentView === 'archived');
+  if (vTrash) vTrash.classList.toggle('active', currentView === 'trash');
 
   filteredSnippets = snippets.filter(s => {
     const matchesSearch = s.text.toLowerCase().includes(searchTerm.toLowerCase());
@@ -250,8 +270,10 @@ function renderSnippets() {
 
             let contentHtml = escapeHtml(item.text);
             if (isMarkdown && window.marked && window.DOMPurify) {
-              const rawHtml = marked.parse(item.text);
-              contentHtml = DOMPurify.sanitize(rawHtml);
+              try {
+                const rawHtml = marked.parse(item.text);
+                contentHtml = DOMPurify.sanitize(rawHtml);
+              } catch (e) { console.error("MD Error", e); }
             }
 
             return `
@@ -334,10 +356,8 @@ async function togglePublic(id, current) {
   try { 
     await updateDoc(doc(db, 'snippets', id), { isPublic: !current }); 
     if (!current) {
-      // Create a full URL relative to the current page (works for subfolders)
       const baseUrl = window.location.href.split('?')[0].split('#')[0];
       const shareUrl = new URL(`public.html?id=${id}`, baseUrl).href;
-      
       navigator.clipboard.writeText(shareUrl);
       showToast('Public link copied! 🔗');
     } else {
@@ -384,8 +404,7 @@ async function loadSnippets() {
   try {
     const q = query(collection(db, 'snippets'), where('userId', '==', currentUser.uid));
     const snap = await getDocs(q);
-    snippets = [];
-    snap.forEach(d => snippets.push({ id: d.id, ...d.data() }));
+    snippets = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     snippets.sort((a, b) => a.pinned === b.pinned ? new Date(b.createdAt) - new Date(a.createdAt) : (a.pinned ? -1 : 1));
     renderSnippets();
   } catch (e) { console.error("Snippets load error", e); }
@@ -425,8 +444,8 @@ document.addEventListener('keydown', (e) => {
 onAuthStateChanged(auth, (u) => { 
   if (u) { 
     currentUser = u; 
-    renderApp(); // First render the app shell
-    loadSnippets(); // Then load and render snippets
+    renderApp(); 
+    loadSnippets(); 
   } else { 
     currentUser = null; 
     renderLogin(); 

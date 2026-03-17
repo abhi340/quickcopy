@@ -53,8 +53,17 @@
         </circle>
       </svg>
       <p style="font-weight: 600; letter-spacing: 0.5px;">Initializing QuickCopy Pro...</p>
+      <p id="loading-fallback" style="font-size: 0.75rem; color: #94a3b8; margin-top: 15px; display: none;">Still loading? Check your internet connection or Firebase configuration.</p>
     </div>
   </div>
+
+  <script>
+    // Show fallback message if app hasn't loaded in 8 seconds
+    setTimeout(() => {
+      const el = document.getElementById('loading-fallback');
+      if (el) el.style.display = 'block';
+    }, 8000);
+  </script>
 
   <!-- App logic is now modularized -->
   <script type="module" src="src/app.js"></script>
