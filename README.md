@@ -1,89 +1,90 @@
-# 🚀 QuickCopy — The Ultimate Cloud Clipboard ☁️
+# 🚀 QuickCopy Pro — The Premium Cloud Clipboard ☁️
 
-> <strong>“One-click copy. Zero drag. All yours.”</strong>
+[![GitHub version](https://img.shields.io/badge/version-2.1.0-blue.svg)](changelog.html)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/abhi340/quickcopy/graphs/commit-activity)
 
-QuickCopy is a <strong>premium, high-performance cloud clipboard manager</strong> co-developed by <strong>[Abhi](https://github.com/abhi340)</strong> and <strong>Gemini (AI Pair Programmer)</strong>. 
+> <strong>“One-click copy. Zero drag. Pure Productivity.”</strong>
 
-What started as a 30-minute prototype has evolved into a fully-featured, secure, and visually stunning productivity tool built with pure vanilla technology.
-
----
-
-## 🤝 The Collaboration Journey
-This project is a testament to the power of <strong>Human-AI Pair Programming</strong>. Here’s how we did it:
-
-1.  <strong>Phase 1: The Sprint (Under 30 Mins)</strong>
-    Abhi and Gemini scaffolded the core architecture using Vanilla JS and Firebase, moving from a blank page to a live cloud-synced app in record time.
-2.  <strong>Phase 2: Security Overhaul</strong>
-    Faced with real-world security challenges, we implemented End-to-End Encryption (E2EE), rotated compromised keys, and established a robust Security Policy.
-3.  <strong>Phase 3: The "Premium" Evolution</strong>
-    We transformed the UI from a basic prototype into a modern Glassmorphism-based experience, optimizing for both PC (Grid Layout) and Mobile (List Layout).
-4.  <strong>Phase 4: UX Polish & Refinement</strong>
-    Through iterative feedback, we fixed alignment issues, added colorful SVG iconography, implemented real-time search, and adopted a minimalist dashboard design.
+QuickCopy Pro is a <strong>high-performance, secure, and visually stunning cloud clipboard manager</strong>. Built with a modern Glassmorphism aesthetic, it allows you to sync text, links, and code snippets across all your devices in real-time.
 
 ---
 
-## ✨ Key Features
+## ✨ Why QuickCopy Pro?
 
-### 🔐 Enterprise-Grade Security
-- <strong>Firebase Auth:</strong> Secure Sign-In via Google and Email/Password.
-- <strong>Credential Protection:</strong> Restricted API keys and protected configuration.
-- <strong>Short-Lived Sessions:</strong> Forced re-authentication on refresh for maximum privacy.
+QuickCopy isn't just a list of texts; it's a <strong>professional-grade digital companion</strong> designed for developers, writers, and power users who need their data to follow them.
 
-### 📋 Smart Clipboard Management
-- <strong>One-Click Copy:</strong> Click anywhere on a card to instantly copy.
-- <strong>Real-Time Sync:</strong> Snippets are instantly available across all your devices.
-- <strong>Smart Auto-Tags:</strong> Automatically detects <strong>Link</strong>, <strong>Code</strong>, or <strong>Text</strong> types.
-- <strong>Pinned Clips:</strong> Keep your most important items at the very top.
+### 🌟 Premium Features
+- <strong>📱 PWA Support:</strong> Install QuickCopy on your desktop or mobile for a native app experience with offline support.
+- <strong>🧱 Masonry Layout:</strong> A beautiful Pinterest-style flow that optimizes vertical space (3 columns on PC, 1 on Mobile).
+- <strong>🔗 Public Sharing:</strong> Generate unique, view-only links for any snippet to share with colleagues or friends.
+- <strong>✍️ Markdown Rendering:</strong> Toggle <strong>M↓</strong> to render beautiful formatted notes, lists, and code blocks.
+- <strong>📦 Advanced Management:</strong> Keep your workspace clean with dedicated <strong>Archive</strong> and <strong>Trash</strong> folders.
+- <strong>⚡ Power-User Shortcuts:</strong>
+  - `Ctrl + Enter`: Instant Save
+  - `Ctrl + F`: Global Search
+  - `Alt + 1-9`: Instant Copy top clips
+  - `Esc`: Clear search/modals
 
-### 🎨 Premium UI/UX
-- <strong>Glassmorphism Design:</strong> Modern frosted-glass aesthetic with fluid animations.
-- <strong>Search & Filter:</strong> Find any snippet instantly from the header search bar.
-- <strong>User-Defined Palettes:</strong> 6 signature color themes (Indigo, Emerald, Rose, Amber, Cyan, Slate).
-- <strong>Responsive Layout:</strong> 3-column grid for PC, 2-column for Laptop, and 1-column for Mobile.
+### 🔐 Security & Privacy
+- <strong>End-to-End Hardening:</strong> Patched against XSS and attribute injection.
+- <strong>DOMPurify Integration:</strong> Every markdown snippet is sanitized before rendering.
+- <strong>Zero-Trust Architecture:</strong> Forced re-login on refresh and restricted Firestore rules.
 
 ---
 
-## 📜 Changelog
+## 🚀 Getting Started
 
-### [v1.3.0] - The minimalist Polish (Latest)
-- <strong>Minimalist Dashboard:</strong> Scaled down icons and refined card layouts for a professional feel.
-- <strong>Header Optimization:</strong> Moved search bar into the header for better vertical space utilization.
-- <strong>Bug Fixes:</strong> Resolved "typing in reverse" search bug and fixed Settings navigation.
-- <strong>Enhanced Wrapping:</strong> Improved text breaking/wrapping logic for long snippets and URLs.
+### 🛠️ Prerequisites
+- A modern web browser (Chrome, Edge, or Safari recommended for PWA).
+- A [Firebase Project](https://console.firebase.google.com/).
 
-### [v1.2.0] - The Visual Overhaul
-- <strong>Glassmorphism UI:</strong> Complete redesign with frosted glass and aurora gradients.
-- <strong>Colorful SVGs:</strong> Replaced monochromatic icons with vibrant, multicolored SVG graphics.
-- <strong>Responsive Grid:</strong> Implemented PC/Laptop/Mobile adaptive layout.
-- <strong>Palette System:</strong> Added user-selectable color themes.
+### 📦 Installation
+1.  <strong>Clone the repository:</strong>
+    ```bash
+    git clone https://github.com/abhi340/quickcopy.git
+    cd quickcopy
+    ```
 
-### [v1.1.0] - Security & Reliability
-- <strong>Credential Protection:</strong> Moved Firebase config to dedicated files and added `.gitignore`.
-- <strong>API Key Rotation:</strong> Successfully rotated compromised keys and applied domain restrictions.
-- <strong>Security Policy:</strong> Added `SECURITY.md` and established private reporting protocols.
-- <strong>Toast Notifications:</strong> Added floating "Copied!" and "Synced!" feedback bubbles.
+2.  <strong>Configure Firebase:</strong>
+    - Copy `firebase-config.example.js` to `firebase-config.js`.
+    - Fill in your actual credentials from the Firebase Console.
+    ```javascript
+    // firebase-config.js
+    export const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      // ... rest of your config
+    };
+    ```
 
-### [v1.0.0] - The 30-Minute MVP
-- Initial release with Firebase Auth and Firestore sync.
-- Basic add/edit/delete functionality.
-- Dark mode support.
+3.  <strong>Launch the app:</strong>
+    Simply open `index.html` in your browser or use a local server like <strong>Live Server</strong> in VS Code.
 
 ---
 
 ## 🛠️ Tech Stack
-- <strong>Frontend:</strong> Vanilla JavaScript (ES Modules), HTML5, CSS3 (Custom Variables).
-- <strong>Backend:</strong> Firebase Authentication & Firestore Real-time Database.
-- <strong>Deployment:</strong> GitHub Pages.
-- <strong>Design:</strong> Modern Glassmorphism & Aurora UI.
+- <strong>Frontend:</strong> Vanilla JavaScript (ES Modules), HTML5, CSS3.
+- <strong>Libraries:</strong> [Marked.js](https://marked.js.org/) (Markdown), [DOMPurify](https://github.com/cure53/dompurify) (Sanitization).
+- <strong>Backend:</strong> Firebase Auth & Firestore Real-time Database.
+- <strong>PWA:</strong> Service Workers & Manifest.json.
+
+---
+
+## 🤝 Collaboration & Contribution
+QuickCopy Pro is a testament to the power of <strong>Human-AI Pair Programming</strong>, co-developed by <strong>[Abhi](https://github.com/abhi340)</strong> and <strong>Gemini (AI Pair Programmer)</strong>.
+
+- <strong>Security issues?</strong> See [SECURITY.md](SECURITY.md).
+- <strong>Interested in our process?</strong> Read the [COLLABORATION.md](COLLABORATION.md).
+- <strong>What's coming next?</strong> Check the [TODO.md](TODO.md).
 
 ---
 
 ## 🙌 Credits
-- <strong>Developer:</strong> [Abhi](https://github.com/abhi340)
-- <strong>Pair Programmer:</strong> Gemini AI
-
-> “We didn’t just build an app. We built a faster way to work.” 🚀
+- <strong>Lead Developer:</strong> [Abhi](https://github.com/abhi340)
+- <strong>AI Engineer:</strong> Gemini AI
 
 ---
 
-👉 <strong>[Try QuickCopy Live](https://abhi340.github.io/quickcopy/)</strong>
+👉 <strong>[Launch QuickCopy Pro Live](https://abhi340.github.io/quickcopy/)</strong>
