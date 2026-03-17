@@ -350,6 +350,23 @@ function renderSnippets() {
             const isMarkdown = item.isMarkdown || false;
 
             let contentHtml = escapeHtml(item.text);
+            let richMediaHtml = '';
+
+            if (type === 'link' && item.text.startsWith('http')) {
+              try {
+                const urlObj = new URL(item.text);
+                const domain = urlObj.hostname;
+                richMediaHtml = `
+                  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding: 12px; background: var(--glass); border-radius: 12px; border: 1px solid var(--glass-border);">
+                    <img src="https://s2.googleusercontent.com/s2/favicons?domain=${domain}&sz=32" style="width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;" onerror="this.style.display='none'" />
+                    <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; flex: 1;">
+                      <a href="${item.text}" target="_blank" style="color: var(--primary); text-decoration: none; display: block; overflow: hidden; text-overflow: ellipsis;">Visit ${domain} <span style="font-size: 0.8rem; margin-left: 4px;">↗</span></a>
+                    </div>
+                  </div>
+                `;
+              } catch(e) {}
+            }
+
             if (isMarkdown && window.marked && window.DOMPurify) {
               try {
                 const rawHtml = marked.parse(item.text);
@@ -369,7 +386,10 @@ function renderSnippets() {
                     ${isMarkdown ? '<span class="badge badge-code" style="background: rgba(99, 102, 241, 0.15); color: #818cf8;">MD</span>' : ''}
                   </div>
                 </div>
-                <div class="snippet-content">${contentHtml}</div>
+                <div class="snippet-content">
+                  ${richMediaHtml}
+                  ${contentHtml}
+                </div>
                 <div class="snippet-footer">
                   <div class="actions-group">
                     ${!isTrash ? `
