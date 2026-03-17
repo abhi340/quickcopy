@@ -159,6 +159,15 @@ function renderApp() {
     <div id="snippets-list-container">
       <!-- Snippets will be injected here -->
     </div>
+
+    <footer class="app-footer">
+      <div class="footer-links">
+        <a href="about.html">About</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="changelog.html">Changelog</a>
+      </div>
+      <p>&copy; 2026 QuickCopy Pro. All rights reserved.</p>
+    </footer>
   `;
 
   // Attach persistent header events
