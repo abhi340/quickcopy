@@ -181,7 +181,7 @@ function renderSignup() {
 // ===== MAIN APP RENDERER =====
 function renderApp() {
   if (!currentUser) return;
-  if (hasRendered) return; // Important: prevent looping if renderApp is called multiple times
+  if (hasRendered) return;
   hasRendered = true;
   
   const initialName = currentUser.email ? currentUser.email.split('@')[0] : 'User';
@@ -229,9 +229,7 @@ function renderApp() {
 
     <div id="tag-filters-container" style="display: flex; gap: 8px; margin-bottom: 24px; overflow-x: auto;"></div>
 
-    <div id="snippets-list-container">
-      <div style="text-align:center; padding:40px; color:var(--text-dim);">Loading your clips...</div>
-    </div>
+    <div id="snippets-list-container"></div>
 
     <footer class="app-footer">
       <div class="footer-links">
