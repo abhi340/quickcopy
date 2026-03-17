@@ -273,6 +273,7 @@ function renderApp() {
   document.getElementById('toggle-theme-btn').onclick = (e) => {
     e.stopPropagation();
     toggleTheme();
+    hasRendered = false; // Reset to allow re-render with new theme text
     renderApp(); 
   };
 

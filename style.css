@@ -1,4 +1,4 @@
-/* ===== QuickCopy Pro: Strict Master Blueprint v3.5 ===== */
+/* ===== QuickCopy Pro: Bulletproof Design System v4.0 ===== */
 :root {
   --primary: #6366f1;
   --primary-glow: rgba(99, 102, 241, 0.4);
@@ -8,7 +8,7 @@
   --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
   --glass: rgba(255, 255, 255, 0.03);
   --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-heavy: rgba(15, 23, 42, 0.85);
+  --glass-heavy: rgba(15, 23, 42, 0.9);
   --text: #f8fafc;
   --text-dim: #94a3b8;
   --white: #ffffff;
@@ -25,31 +25,38 @@ body:not(.dark-mode) {
   --hover-bg: rgba(99, 102, 241, 0.08);
 }
 
-/* ===== Resets & Layout Guard ===== */
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; }
-html, body { width: 100%; min-height: 100vh; }
-body { background: var(--bg-gradient); background-attachment: fixed; color: var(--text); padding: 20px; transition: background 0.4s; overflow-x: hidden; }
+/* ===== Resets & Core Scaling ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, system-ui, sans-serif; }
+html { font-size: 16px; width: 100%; height: 100%; }
+body { background: var(--bg-gradient); background-attachment: fixed; color: var(--text); min-height: 100vh; padding: 20px; transition: background 0.4s; overflow-x: hidden; line-height: 1.5; }
 #app { width: 100%; max-width: 1200px; margin: 0 auto; animation: fadeIn 0.4s ease-out; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ===== Unified Glass Card ===== */
+/* ===== Unified Glass Component ===== */
 .glass-card { background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2); }
 
-/* ===== Header Section (PIXEL PERFECT) ===== */
+/* ===== Header (Dashboard Only) ===== */
 .header {
   display: flex; align-items: center; justify-content: space-between; gap: 20px;
   background: var(--glass-heavy); padding: 12px 24px; border-radius: 18px;
   border: 1px solid var(--glass-border); backdrop-filter: blur(25px);
   position: sticky; top: 15px; z-index: 1000; margin-bottom: 32px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
-.user-greeting { font-weight: 800; font-size: 1.1rem; white-space: nowrap; }
+.user-greeting { font-weight: 800; font-size: 1.1rem; white-space: nowrap; flex-shrink: 0; }
 .header-search-container { position: relative; flex: 1; max-width: 500px; }
 .header-search-container svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; opacity: 0.5; pointer-events: none; }
 #search-input { width: 100%; background: rgba(0,0,0,0.1); padding: 12px 16px 12px 44px; border-radius: 14px; border: 1px solid var(--glass-border); color: var(--text); font-size: 0.95rem; }
 #search-input:focus { border-color: var(--primary); outline: none; background: rgba(0,0,0,0.2); }
 
-/* ===== Profile & Dropdown ===== */
+/* ===== Add Clip Bar (THE FIX) ===== */
+.main-input-card { margin-bottom: 32px; padding: 16px 20px !important; }
+#input-area { display: flex; gap: 16px; align-items: center; width: 100%; min-height: 52px; }
+#new-snippet { flex: 1; min-height: 52px; background: rgba(0,0,0,0.1); border: 1px solid var(--glass-border); padding: 0 20px; border-radius: 16px; color: var(--text); font-size: 1rem; outline: none; }
+#new-snippet:focus { background: rgba(0,0,0,0.2); border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-glow); }
+#add-btn { height: 52px; padding: 0 32px; font-weight: 700; white-space: nowrap; flex-shrink: 0; cursor: pointer; background: var(--primary); color: white; border: none; border-radius: 14px; transition: 0.2s; }
+#add-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px var(--primary-glow); }
+
+/* ===== Profile Dropdown ===== */
 .profile-dropdown-container { position: relative; }
 .profile-btn { background: var(--glass); border: 1px solid var(--glass-border); width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); transition: 0.2s; }
 .dropdown-menu { position: absolute; top: 55px; right: 0; background: var(--glass-heavy); backdrop-filter: blur(30px); border: 1px solid var(--glass-border); border-radius: 16px; width: 220px; z-index: 2000; padding: 8px; box-shadow: 0 15px 40px rgba(0,0,0,0.4); display: none; }
@@ -57,68 +64,53 @@ body { background: var(--bg-gradient); background-attachment: fixed; color: var(
 .dropdown-item { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 16px; border-radius: 12px; background: none; border: none; color: var(--text); font-weight: 600; cursor: pointer; text-align: left; font-size: 0.95rem; }
 .dropdown-item:hover { background: var(--hover-bg); }
 
-/* ===== Add Clip Bar (STRICT ALIGNMENT) ===== */
-.main-input-card { margin-bottom: 32px; padding: 12px 16px !important; }
-#input-area { display: flex; gap: 12px; align-items: center; width: 100%; }
-#new-snippet { flex: 1; height: 48px; background: rgba(0,0,0,0.1); border: 1px solid var(--glass-border); padding: 0 16px; border-radius: 12px; color: var(--text); font-size: 1rem; }
-#add-btn { height: 48px; padding: 0 24px; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
-
-/* ===== Masonry Grid ===== */
+/* ===== Masonry Grid (FIXED) ===== */
 #snippets-list { column-count: 3; column-gap: 24px; width: 100%; }
 @media (max-width: 1100px) { #snippets-list { column-count: 2; } }
 @media (max-width: 700px) { #snippets-list { column-count: 1; } }
 
-.snippet-card { break-inside: avoid; display: block; width: 100%; margin-bottom: 24px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; transition: 0.3s; cursor: pointer; }
+.snippet-card { break-inside: avoid; display: inline-block; width: 100%; margin-bottom: 24px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; transition: 0.3s; cursor: pointer; position: relative; }
 .snippet-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 12px 32px rgba(0,0,0,0.2); }
 .snippet-card.pinned { border-top: 5px solid #f59e0b; }
 .snippet-content { font-size: 1rem; line-height: 1.6; margin-bottom: 16px; word-break: break-word; overflow-wrap: anywhere; white-space: pre-wrap; color: var(--text); }
 
-/* ===== Buttons & UI ===== */
-.btn { padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem; }
-.btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 15px var(--primary-glow); }
-.btn-outline { background: transparent; border: 1px solid var(--glass-border); color: var(--text); }
-.btn-outline.active { background: var(--primary); color: white; border-color: var(--primary); }
-.icon-btn { width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--glass-border); background: var(--glass); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.icon-btn svg { width: 18px !important; height: 18px !important; }
-.badge { font-size: 0.7rem; font-weight: 800; padding: 4px 10px; border-radius: 8px; text-transform: uppercase; display: inline-block; margin-bottom: 12px; }
-.badge-code { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
-.badge-link { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-.badge-text { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
-
-/* ===== Landing & Auth (PIXEL PERFECT) ===== */
+/* ===== Landing Page (STABLE) ===== */
 .landing-layout { display: flex; align-items: center; justify-content: center; min-height: 85vh; gap: 60px; flex-wrap: wrap; padding: 40px 0; }
 .landing-hero { flex: 1; min-width: 320px; max-width: 550px; }
 .landing-hero h1 { font-size: clamp(2.5rem, 6vw, 4rem); line-height: 1.1; letter-spacing: -2px; margin-bottom: 20px; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .landing-hero p { font-size: 1.2rem; color: var(--text-dim); line-height: 1.6; margin-bottom: 40px; }
-.landing-features { display: flex; flex-direction: column; gap: 24px; }
-.landing-feature { display: flex; align-items: flex-start; gap: 18px; color: var(--text); }
-.landing-feature .icon-box { background: var(--glass); padding: 12px; border-radius: 14px; border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; flex-shrink: 0; }
-.feat-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 4px; }
-.feat-desc { font-size: 0.9rem; color: var(--text-dim); }
 .landing-auth { flex: 1; min-width: 320px; max-width: 420px; width: 100%; }
 .auth-container h2 { font-size: 2rem; margin-bottom: 24px; text-align: center; }
 .auth-container input { width: 100%; padding: 16px 20px; background: rgba(0,0,0,0.1); border: 1px solid var(--glass-border); border-radius: 16px; color: var(--text); font-size: 1rem; margin-bottom: 12px; }
-.google-btn { background: var(--white); color: #1f2937; margin-top: 12px; border: 1px solid #e5e7eb; }
 
-/* ===== Settings & Secondary Pages (FIXED SCALE) ===== */
+/* ===== Settings (SCALED) ===== */
 .profile-layout { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
 .profile-hero { text-align: center; padding: 40px 20px; }
 .profile-avatar { width: 80px; height: 80px; margin: 0 auto 16px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 .profile-avatar svg { width: 36px !important; height: 36px !important; color: white; }
 .grid-layout-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
 .stat-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--glass-border); font-size: 0.95rem; }
-.card-title { display: flex; align-items: center; gap: 10px; font-weight: 800; margin-bottom: 16px; font-size: 1.1rem; }
 
-/* ===== Utils & Mobile ===== */
-@media (max-width: 600px) {
-  body { padding: 12px; }
-  .header { padding: 12px 16px; top: 10px; flex-direction: column; align-items: stretch; }
-  .header-search-container { max-width: 100%; order: 3; }
-  #input-area { flex-direction: column; gap: 10px; }
-  #add-btn { width: 100%; }
-}
+/* ===== Badges & Utilities ===== */
+.badge { font-size: 0.7rem; font-weight: 800; padding: 4px 10px; border-radius: 8px; text-transform: uppercase; margin-bottom: 12px; display: inline-block; }
+.badge-code { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.badge-link { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+.badge-text { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+.btn-outline { background: transparent; border: 1px solid var(--glass-border); color: var(--text); }
+.btn-outline.active { background: var(--primary); color: white; border-color: var(--primary); }
+.icon-btn { width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--glass-border); background: var(--glass); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+svg { width: 18px; height: 18px; }
 .spinner { width: 40px !important; height: 40px !important; border: 3px solid var(--glass-border); border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .app-footer { margin-top: 60px; padding: 40px 20px; text-align: center; border-top: 1px solid var(--glass-border); color: var(--text-dim); }
 .footer-links { display: flex; justify-content: center; gap: 32px; margin-bottom: 16px; }
 .footer-links a { color: var(--text); text-decoration: none; font-weight: 600; }
+
+/* ===== Mobile Specific ===== */
+@media (max-width: 600px) {
+  body { padding: 12px; }
+  .header { padding: 12px 16px; top: 10px; flex-direction: column; align-items: stretch; }
+  .header-search-container { max-width: 100%; order: 3; }
+  #input-area { flex-direction: column; gap: 12px; }
+  #add-btn { width: 100% !important; }
+}
