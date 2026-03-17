@@ -398,6 +398,12 @@ document.addEventListener('keydown', (e) => {
 
 // ===== INITIALIZATION =====
 onAuthStateChanged(auth, (u) => { 
-  if (u) { currentUser = u; loadSnippets(); } 
-  else { currentUser = null; renderLogin(); } 
+  if (u) { 
+    currentUser = u; 
+    renderApp(); // First render the app shell
+    loadSnippets(); // Then load and render snippets
+  } else { 
+    currentUser = null; 
+    renderLogin(); 
+  } 
 });

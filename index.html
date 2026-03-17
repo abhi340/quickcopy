@@ -13,6 +13,29 @@
   <link rel="preload" href="style.css" as="style">
   <link rel="modulepreload" href="src/app.js">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <style>
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: #6366f1;
+      font-family: 'Inter', sans-serif;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(99, 102, 241, 0.2);
+      border-radius: 50%;
+      border-top-color: #6366f1;
+      animation: spin 1s ease-in-out infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
   <noscript>
@@ -23,9 +46,13 @@
   </noscript>
 
   <div id="app">
-    <div style="text-align:center; padding:2rem;">
-      <div style="font-size:24px; margin-bottom:1rem;">📋</div>
-      <p>Loading QuickCopy…</p>
+    <div class="loading-container">
+      <svg class="spinner" viewBox="0 0 50 50">
+        <circle cx="25" cy="25" r="20" fill="none" stroke="currentColor" stroke-width="5" stroke-dasharray="80, 200" stroke-dashoffset="0" stroke-linecap="round">
+          <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1.5s" repeatCount="indefinite" />
+        </circle>
+      </svg>
+      <p style="font-weight: 600; letter-spacing: 0.5px;">Initializing QuickCopy Pro...</p>
     </div>
   </div>
 
