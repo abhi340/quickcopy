@@ -43,21 +43,51 @@ function renderLogin() {
   
   hasRendered = false; // Reset on logout
   appEl.innerHTML = `
-    <div class="auth-container">
-      <h1>QuickCopy</h1>
-      <p class="auth-subtitle">Your clipboard, everywhere.</p>
-      <div class="glass-card">
-        <input type="email" id="login-email" placeholder="Email" autocomplete="email" />
-        <input type="password" id="login-password" placeholder="Password" autocomplete="current-password" />
-        <button class="btn btn-primary" id="login-btn">Sign In</button>
-        <button class="btn btn-outline" id="forgot-password-btn">Forgot Password?</button>
-        <button class="btn btn-outline" id="show-signup-btn">Create New Account</button>
-        
-        <div class="google-btn btn" id="google-signin-btn">
-          <span class="nav-icon">${ICONS.google}</span>
-          <span>Continue with Google</span>
+    <div class="landing-layout">
+      <div class="landing-hero">
+        <h1>Your Digital<br>Second Brain.</h1>
+        <p>Sync your clipboard, code snippets, and links across all devices instantly. Built with End-to-End security and a stunning Glassmorphism UI.</p>
+        <div class="landing-features">
+          <div class="landing-feature">
+            <div class="icon-box">${ICONS.shield}</div>
+            <div>
+              <div style="font-weight: 800;">Zero-Trust Architecture</div>
+              <div style="font-size: 0.85rem; color: var(--text-dim); font-weight: 500;">Your data is encrypted and secure.</div>
+            </div>
+          </div>
+          <div class="landing-feature">
+            <div class="icon-box">${ICONS.markdown}</div>
+            <div>
+              <div style="font-weight: 800;">Native Markdown</div>
+              <div style="font-size: 0.85rem; color: var(--text-dim); font-weight: 500;">Beautifully rendered notes and code.</div>
+            </div>
+          </div>
+          <div class="landing-feature">
+            <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></div>
+            <div>
+              <div style="font-weight: 800;">Install Anywhere</div>
+              <div style="font-size: 0.85rem; color: var(--text-dim); font-weight: 500;">Full PWA support for Mobile and Desktop.</div>
+            </div>
+          </div>
         </div>
-        <div id="login-error" class="error" style="display:none;"></div>
+      </div>
+      <div class="landing-auth">
+        <div class="auth-container" style="margin: 0; max-width: 100%; width: 100%;">
+          <div class="glass-card">
+            <h2 style="font-weight: 900; margin-bottom: 20px; text-align: left;">Welcome Back</h2>
+            <input type="email" id="login-email" placeholder="Email" autocomplete="email" />
+            <input type="password" id="login-password" placeholder="Password" autocomplete="current-password" />
+            <button class="btn btn-primary" id="login-btn">Sign In</button>
+            <button class="btn btn-outline" id="forgot-password-btn">Forgot Password?</button>
+            <button class="btn btn-outline" id="show-signup-btn">Create New Account</button>
+            
+            <div class="google-btn btn" id="google-signin-btn">
+              <span class="nav-icon">${ICONS.google}</span>
+              <span>Continue with Google</span>
+            </div>
+            <div id="login-error" class="error" style="display:none;"></div>
+          </div>
+        </div>
       </div>
     </div>
   `;
@@ -73,8 +103,20 @@ function renderLogin() {
   document.getElementById('forgot-password-btn').onclick = showForgotPasswordModal;
   document.getElementById('show-signup-btn').onclick = renderSignup;
   document.getElementById('google-signin-btn').onclick = async () => {
-    try { await signInWithPopup(auth, new GoogleAuthProvider()); } 
-    catch (err) { showError(getFriendlyAuthError(err.code), 'login-error'); }
+    console.log("🚀 Attempting Google Sign-In...");
+    try { 
+      const provider = new GoogleAuthProvider();
+      // Optional: Add custom parameters if needed
+      // provider.setCustomParameters({ prompt: 'select_account' });
+      await signInWithPopup(auth, provider); 
+      console.log("✅ Google Sign-In Successful!");
+    } catch (err) { 
+      console.error("❌ Google Auth Error:", err.code, err.message);
+      if (err.code === 'auth/unauthorized-domain') {
+        alert("🔒 UNAUTHORIZED DOMAIN: Please add " + window.location.hostname + " to your Firebase Authorized Domains list.");
+      }
+      showError(getFriendlyAuthError(err.code), 'login-error'); 
+    }
   };
 }
 
