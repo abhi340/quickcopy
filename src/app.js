@@ -15,6 +15,7 @@ let snippets = [];
 let filteredSnippets = [];
 let searchTerm = '';
 let currentView = 'active'; // active, archived, trash
+let currentTag = 'all'; // all, #Link, #Code
 let hasRendered = false; // Prevent multiple renders
 
 // Load Marked.js & DOMPurify
@@ -213,11 +214,13 @@ function renderApp() {
       </div>
     </div>
 
-    <div style="display: flex; gap: 12px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 8px;">
+    <div style="display: flex; gap: 12px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 8px;">
       <button class="btn btn-outline ${currentView === 'active' ? 'active' : ''}" id="view-active" style="width:auto; padding: 8px 16px; font-size: 0.85rem;">Active</button>
       <button class="btn btn-outline ${currentView === 'archived' ? 'active' : ''}" id="view-archived" style="width:auto; padding: 8px 16px; font-size: 0.85rem;">Archived</button>
       <button class="btn btn-outline ${currentView === 'trash' ? 'active' : ''}" id="view-trash" style="width:auto; padding: 8px 16px; font-size: 0.85rem;">Trash</button>
     </div>
+
+    <div id="tag-filters-container" style="display: flex; gap: 8px; margin-bottom: 24px; overflow-x: auto;"></div>
 
     <div id="snippets-list-container">
       <div style="text-align:center; padding:40px; color:var(--text-dim);">Loading your clips...</div>
@@ -310,13 +313,36 @@ function renderSnippets() {
   filteredSnippets = snippets.filter(s => {
     const matchesSearch = s.text.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = (s.status || 'active') === currentView;
-    return matchesSearch && matchesStatus;
+    const matchesTag = currentTag === 'all' || (s.tags && s.tags.includes(currentTag));
+    return matchesSearch && matchesStatus && matchesTag;
   });
+
+  const allTags = new Set();
+  snippets.filter(s => (s.status || 'active') === currentView).forEach(s => {
+    if (s.tags) s.tags.forEach(t => allTags.add(t));
+  });
+  
+  const tagsContainer = document.getElementById('tag-filters-container');
+  if (tagsContainer) {
+    if (allTags.size > 0) {
+      tagsContainer.innerHTML = `
+        <button class="badge ${currentTag === 'all' ? 'badge-text' : ''}" data-tag="all" style="cursor:pointer; opacity: ${currentTag === 'all' ? '1' : '0.5'}; border: 1px solid var(--glass-border); background: transparent;">All</button>
+        ${Array.from(allTags).map(tag => `
+          <button class="badge ${tag === '#Link' ? 'badge-link' : (tag === '#Code' ? 'badge-code' : 'badge-text')}" data-tag="${tag}" style="cursor:pointer; opacity: ${currentTag === tag ? '1' : '0.5'}; border: 1px solid var(--glass-border);">${tag}</button>
+        `).join('')}
+      `;
+      tagsContainer.querySelectorAll('button').forEach(btn => {
+        btn.onclick = () => { currentTag = btn.dataset.tag; renderSnippets(); };
+      });
+    } else {
+      tagsContainer.innerHTML = '';
+    }
+  }
 
   container.innerHTML = `
     <div id="snippets-list">
       ${filteredSnippets.length === 0 
-        ? `<div class="glass-card empty-state">No clips found in ${currentView}. ${searchTerm ? 'Try a different search.' : 'Add your first one!'}</div>` 
+        ? `<div class="glass-card empty-state">No clips found. ${searchTerm || currentTag !== 'all' ? 'Try changing filters.' : 'Add your first one!'}</div>` 
         : filteredSnippets.map((item, i) => {
             const type = getSnippetType(item.text);
             const isTrash = item.status === 'trash';
@@ -334,7 +360,10 @@ function renderSnippets() {
             return `
               <div class="snippet-card ${item.pinned ? 'pinned' : ''}" data-index="${i}" title="Click to copy">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                  <span class="badge badge-${type}">${type}</span>
+                  <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                    <span class="badge badge-${type}">${type}</span>
+                    ${(item.tags || []).map(t => `<span class="badge ${t === '#Link' ? 'badge-link' : (t === '#Code' ? 'badge-code' : 'badge-text')}" style="opacity: 0.8; font-weight: 500;">${t}</span>`).join('')}
+                  </div>
                   <div style="display: flex; gap: 4px;">
                     ${item.isPublic ? '<span class="badge badge-link" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">Public</span>' : ''}
                     ${isMarkdown ? '<span class="badge badge-code" style="background: rgba(99, 102, 241, 0.15); color: #818cf8;">MD</span>' : ''}
@@ -386,6 +415,12 @@ async function addSnippet() {
   const input = document.getElementById('new-snippet');
   const val = input.value.trim();
   if (!val) return;
+
+  const type = getSnippetType(val);
+  const tags = [];
+  if (type === 'link') tags.push('#Link');
+  if (type === 'code') tags.push('#Code');
+
   try {
     await addDoc(collection(db, 'snippets'), { 
       text: val, 
@@ -394,6 +429,7 @@ async function addSnippet() {
       status: 'active',
       isPublic: false,
       isMarkdown: false,
+      tags: tags,
       createdAt: new Date().toISOString() 
     });
     input.value = ''; 
