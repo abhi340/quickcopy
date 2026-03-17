@@ -18,25 +18,41 @@
             <h1 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 20px; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">What's New.</h1>
             <p style="margin-bottom: 20px;">Keep track of the latest updates and improvements to QuickCopy.</p>
 
-            <div class="glass-card stats-card" style="margin-top: 32px; border-left: 5px solid var(--primary);">
-                <div class="card-title" style="color: var(--primary);">v2.0.0 (Latest Release)</div>
-                <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 12px;">Released on March 17, 2026</p>
+            <!-- Latest Release v2.1.0 -->
+            <div class="glass-card stats-card" style="margin-top: 32px; border-left: 5px solid var(--success);">
+                <div class="card-title" style="color: var(--success);">v2.1.0 (Security & Power Update)</div>
+                <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 12px;">Released on March 17, 2026 (16:30 PM)</p>
                 <ul style="margin-left: 20px; font-size: 0.95rem;">
-                    <li>**Dynamic Masonry Layout:** Snippets now stack naturally based on their content height.</li>
-                    <li>**Responsive Columns:** Strictly locked to 1 column on mobile and 3 columns on desktop.</li>
-                    <li>**Premium Glassmorphism UI:** Complete visual overhaul with enhanced transparency and blur effects.</li>
-                    <li>**Advanced Search:** Real-time snippet filtering.</li>
-                    <li>**Pinning System:** Highlighting important clips.</li>
+                    <li><strong>Security Hardening:</strong> Implemented XSS patches for HTML attributes and integrated DOMPurify for secure Markdown rendering.</li>
+                    <li><strong>Public Snippet Sharing:</strong> Generate unique, view-only links for any snippet with one click.</li>
+                    <li><strong>PWA Support:</strong> QuickCopy is now installable! Added Service Worker for offline caching and a professional manifest.</li>
+                    <li><strong>Archiving & Trash:</strong> Move snippets to Archive or Trash to keep your main workspace organized.</li>
+                    <li><strong>Keyboard Shortcuts:</strong> Added Ctrl+Enter to save, Ctrl+F to search, and Alt+1-9 for instant copying.</li>
+                    <li><strong>Markdown Support:</strong> Toggle M↓ to render beautiful Markdown notes and code blocks.</li>
                 </ul>
             </div>
 
+            <!-- v2.0.0 -->
+            <div class="glass-card stats-card" style="margin-top: 24px; border-left: 5px solid var(--primary);">
+                <div class="card-title" style="color: var(--primary);">v2.0.0 (The UI Overhaul)</div>
+                <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 12px;">Released on March 17, 2026 (12:00 PM)</p>
+                <ul style="margin-left: 20px; font-size: 0.95rem;">
+                    <li><strong>Dynamic Masonry Layout:</strong> Snippets now stack naturally based on their content height.</li>
+                    <li><strong>Responsive Columns:</strong> Strictly locked to 1 column on mobile and 3 columns on desktop.</li>
+                    <li><strong>Premium Glassmorphism UI:</strong> Complete visual overhaul with enhanced transparency and blur effects.</li>
+                    <li><strong>Advanced Search:</strong> Real-time snippet filtering.</li>
+                    <li><strong>Pinning System:</strong> Highlight your most important clips.</li>
+                </ul>
+            </div>
+
+            <!-- v1.5.0 -->
             <div class="glass-card stats-card" style="margin-top: 24px; border-left: 5px solid var(--text-dim); opacity: 0.8;">
                 <div class="card-title" style="color: var(--text-dim);">v1.5.0</div>
                 <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 12px;">Released on March 10, 2026</p>
                 <ul style="margin-left: 20px; font-size: 0.9rem;">
-                    <li>**Dark/Light Mode:** Initial support for dynamic themes.</li>
-                    <li>**Google Sign-In:** Secure authentication via Google accounts.</li>
-                    <li>**Profile Dashboard:** Dedicated space for user settings.</li>
+                    <li><strong>Dark/Light Mode:</strong> Initial support for dynamic themes.</li>
+                    <li><strong>Google Sign-In:</strong> Secure authentication via Google accounts.</li>
+                    <li><strong>Profile Dashboard:</strong> Dedicated space for user settings.</li>
                 </ul>
             </div>
 
