@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Settings | QuickCopy Pro</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
+</head>
+<body>
+  <div id="app">
+    <div class="loading-container">
+      <svg class="spinner" viewBox="0 0 50 50">
+        <circle cx="25" cy="25" r="20" fill="none" stroke="#6366f1" stroke-width="5" stroke-dasharray="80, 200" stroke-dashoffset="0" stroke-linecap="round">
+          <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1.5s" repeatCount="indefinite" />
+        </circle>
+      </svg>
+      <p style="font-weight: 600; margin-top: 20px; color: #6366f1;">Loading Pro Settings...</p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db, onAuthStateChanged, collection, getDocs, query, where, updateDoc, addDoc, deleteDoc, doc } from './src/firebase.js';
+    import { ICONS } from './src/icons.js';
+    import { palettes, applyPalette, initTheme } from './src/theme.js';
+    import { showToast, escapeHtml } from './src/utils.js';
+
+    let currentUser = null;
+    let stats = {
+      total: 0,
+      active: 0,
+      archived: 0,
+      trash: 0,
+      pinned: 0
+    };
+
+    initTheme();
+
+    // Time out if auth takes too long (fallback)
+    const authTimeout = setTimeout(() => {
+      if (!currentUser) {
+        window.location.href = 'index.html';
+      }
+    }, 5000);
+
+    onAuthStateChanged(auth, async (user) => {
+      clearTimeout(authTimeout);
+      if (user) {
+        currentUser = user;
+        try {
+          await loadStats();
+          renderSettings();
+        } catch (err) {
+          console.error("Stats load critical error", err);
+          renderSettings(); // Render anyway even if stats fail
+        }
+      } else {
+        window.location.href = 'index.html';
+      }
+    });
+
+    async function loadStats() {
+      const q = query(collection(db, 'snippets'), where('userId', '==', currentUser.uid));
+      const snap = await getDocs(q);
+      const docs = snap.docs.map(d => d.data());
+      
+      stats.total = docs.length;
+      stats.active = docs.filter(d => (d.status || 'active') === 'active').length;
+      stats.archived = docs.filter(d => d.status === 'archived').length;
+      stats.trash = docs.filter(d => d.status === 'trash').length;
+      stats.pinned = docs.filter(d => d.pinned).length;
+    }
+
+    async function renderSettings() {
+      const user = currentUser;
+      let userName = user.email ? user.email.split('@')[0] : 'User';
+      let userCreated = user.metadata.creationTime ? new Date(user.metadata.creationTime).toLocaleDateString() : 'Unknown';
+      
+      try {
+        const q = query(collection(db, 'users'), where('uid', '==', user.uid));
+        const snap = await getDocs(q);
+        if (!snap.empty) userName = snap.docs[0].data().name || userName;
+      } catch (err) {}
+
+      document.getElementById('app').innerHTML = `
+        <div class="header">
+          <button class="icon-btn" onclick="window.location.href='index.html'" style="width:auto; padding:0 12px; height:40px;">← Back to Clips</button>
+          <h2 style="font-weight:800;">Account Settings</h2>
+        </div>
+        
+        <div class="profile-layout">
+          <!-- Profile Hero -->
+          <div class="glass-card profile-hero">
+            <div class="profile-avatar">${ICONS.profile}</div>
+            <h2 id="profile-name-display">${escapeHtml(userName)}</h2>
+            <p>${user.email}</p>
+            <p style="font-size: 0.75rem; margin-top: 4px; opacity: 0.7;">Member since: ${userCreated}</p>
+            <button class="btn btn-outline" id="edit-name-btn" style="width:auto; margin: 15px auto 0; padding: 8px 16px; font-size: 0.85rem;">Edit Profile Name</button>
+            <div class="account-badge">PRO Account</div>
+          </div>
+
+          <!-- Detailed Stats -->
+          <div class="glass-card">
+            <div class="card-title">${ICONS.stats} Productivity Analytics</div>
+            <div class="grid-layout-2" style="margin-top: 10px;">
+              <div class="stat-item">
+                <span class="stat-label">Total Clips</span>
+                <span class="stat-value">${stats.total}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Active</span>
+                <span class="stat-value">${stats.active}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Pinned Items</span>
+                <span class="stat-value">${stats.pinned}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Archived</span>
+                <span class="stat-value">${stats.archived}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Data Management -->
+          <div class="grid-layout-2">
+            <div class="glass-card">
+              <div class="card-title">📥 Data Portability</div>
+              <p class="security-note">Download all your clips as a JSON file for backup.</p>
+              <button class="btn btn-outline" id="export-btn" style="font-size: 0.85rem;">Export My Clips (.json)</button>
+            </div>
+
+            <div class="glass-card">
+              <div class="card-title">🧹 Maintenance</div>
+              <p class="security-note">Instantly clear your workspace. This action is irreversible.</p>
+              <button class="btn btn-outline danger" id="clear-all-btn" style="font-size: 0.85rem; border-color: #f43f5e; color: #f43f5e;">Clear All Clips</button>
+            </div>
+          </div>
+
+          <!-- Themes -->
+          <div class="glass-card">
+            <h3 style="margin-bottom:16px;">Appearance Themes</h3>
+            <p class="security-note">Select a signature color palette for your Pro workspace.</p>
+            <div class="palette-grid">
+              ${palettes.map(p => `
+                <div class="palette-swatch ${JSON.parse(localStorage.getItem('quickcopy_palette'))?.name === p.name ? 'active' : ''}" 
+                     style="background: linear-gradient(135deg, ${p.primary}, ${p.secondary})"
+                     data-name="${p.name}" title="${p.name}"></div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Danger Zone -->
+          <div class="glass-card" style="border: 1px solid rgba(244, 63, 94, 0.3);">
+            <div class="card-title" style="color: #f43f5e;">⚠️ Danger Zone</div>
+            <p class="security-note">Permanent account deletion will wipe all your snippets from our cloud servers.</p>
+            <button class="btn btn-outline danger" id="delete-acc-btn" style="background: rgba(244, 63, 94, 0.1); border-color: #f43f5e; color: #f43f5e; font-size: 0.85rem;">Delete Pro Account</button>
+          </div>
+        </div>
+
+        <footer class="app-footer">
+          <div class="footer-links">
+            <a href="about.html">About</a>
+            <a href="privacy.html">Privacy</a>
+            <a href="changelog.html">Changelog</a>
+          </div>
+          <p>&copy; 2026 QuickCopy Pro. All rights reserved.</p>
+        </footer>
+      `;
+
+      // Attach events
+      document.getElementById('edit-name-btn').onclick = editProfileName;
+      document.getElementById('export-btn').onclick = exportClips;
+      document.getElementById('clear-all-btn').onclick = clearAllClips;
+      document.getElementById('delete-acc-btn').onclick = confirmDeleteAccount;
+      
+      document.querySelectorAll('.palette-swatch').forEach(swatch => {
+        swatch.onclick = () => {
+          const name = swatch.dataset.name;
+          const p = palettes.find(pal => pal.name === name);
+          if (p) {
+            applyPalette(p);
+            renderSettings();
+          }
+        };
+      });
+    }
+
+    async function editProfileName() {
+      const newName = prompt("Enter your new profile name:");
+      if (newName && newName.trim()) {
+        try {
+          const q = query(collection(db, 'users'), where('uid', '==', currentUser.uid));
+          const snap = await getDocs(q);
+          if (!snap.empty) {
+            await updateDoc(doc(db, 'users', snap.docs[0].id), { name: newName.trim() });
+          } else {
+            await addDoc(collection(db, 'users'), { uid: currentUser.uid, name: newName.trim(), email: currentUser.email, createdAt: new Date().toISOString() });
+          }
+          showToast('Name updated! ✨');
+          renderSettings();
+        } catch (e) { showToast('Update failed.', '❌'); }
+      }
+    }
+
+    async function exportClips() {
+      try {
+        const q = query(collection(db, 'snippets'), where('userId', '==', currentUser.uid));
+        const snap = await getDocs(q);
+        const data = snap.docs.map(d => ({
+          text: d.data().text,
+          status: d.data().status || 'active',
+          pinned: d.data().pinned || false,
+          createdAt: d.data().createdAt
+        }));
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `QuickCopy_Export_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        showToast('Export successful! 📥');
+      } catch (e) { showToast('Export failed.', '❌'); }
+    }
+
+    async function clearAllClips() {
+      if (confirm("Are you ABSOLUTELY sure? This will permanently delete ALL your clips. This cannot be undone.")) {
+        try {
+          const q = query(collection(db, 'snippets'), where('userId', '==', currentUser.uid));
+          const snap = await getDocs(q);
+          const deletePromises = snap.docs.map(d => deleteDoc(doc(db, 'snippets', d.id)));
+          await Promise.all(deletePromises);
+          showToast('Workspace cleared! 🧹');
+          await loadStats();
+          renderSettings();
+        } catch (e) { showToast('Action failed.', '❌'); }
+      }
+    }
+
+    function confirmDeleteAccount() {
+      if (confirm('DANGER: This will permanently delete your account and all data. Proceed?')) {
+        auth.currentUser.delete().then(() => {
+          window.location.href = 'index.html';
+        }).catch(e => {
+          alert("For security, please logout and log back in before deleting your account.");
+        });
+      }
+    }
+  </script>
+</body>
+</html>

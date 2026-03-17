@@ -1,0 +1,18 @@
+{
+  "name": "QuickCopy Pro",
+  "short_name": "QuickCopy",
+  "description": "Premium cloud clipboard with masonry layout and end-to-end sync.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#6366f1",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1621/1621635.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
