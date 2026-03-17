@@ -12,20 +12,20 @@
 - [ ] Register Service Worker in `index.html`.
 
 ## 🛠️ Phase 3: Advanced Snippet Management
-- [ ] **Archiving & Trash:**
+- [ ] <strong>Archiving & Trash:</strong>
     - Update Firestore schema to include `status` (active, archived, trash).
     - Add "Archive" and "Move to Trash" buttons to snippet cards.
     - Add filters to view Archived/Trash snippets.
-- [ ] **Public Sharing:**
+- [ ] <strong>Public Sharing:</strong>
     - Add `isPublic` field to snippets.
     - Create a shareable link generator.
     - Implement a lightweight "Public View" mode for shared links.
 
 ## ✍️ Phase 4: Enhanced Content & UX
-- [ ] **Markdown Rendering:**
+- [ ] <strong>Markdown Rendering:</strong>
     - Integrate `marked.js` for rendering snippets.
     - Add a toggle to preview/edit markdown.
-- [ ] **Keyboard Power-User Shortcuts:**
+- [ ] <strong>Keyboard Power-User Shortcuts:</strong>
     - `Ctrl + Enter`: Save Snippet.
     - `Ctrl + F`: Global Search.
     - `Alt + [1-9]`: Copy top snippets.
