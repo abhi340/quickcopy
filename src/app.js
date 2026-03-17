@@ -252,13 +252,12 @@ function renderApp() {
 
   profileBtn.onclick = (e) => { 
     e.stopPropagation(); 
-    const isHidden = dropdown.style.display === 'none';
-    dropdown.style.display = isHidden ? 'block' : 'none'; 
+    dropdown.classList.toggle('show'); 
   };
   
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.profile-dropdown-container')) {
-      dropdown.style.display = 'none';
+      dropdown.classList.remove('show');
     }
   });
 
