@@ -75,9 +75,9 @@ QuickCopy isn't just a list of texts; it's a <strong>professional-grade digital 
 ## 🤝 Collaboration & Contribution
 QuickCopy Pro is a testament to the power of <strong>Human-AI Pair Programming</strong>, co-developed by <strong>[Abhi](https://github.com/abhi340)</strong> and <strong>Gemini (AI Pair Programmer)</strong>.
 
-- <strong>Security issues?</strong> See [SECURITY.md](SECURITY.md).
-- <strong>Interested in our process?</strong> Read the [COLLABORATION.md](COLLABORATION.md).
-- <strong>What's coming next?</strong> Check the [TODO.md](TODO.md).
+- <strong>Security issues?</strong> See [docs/SECURITY.md](docs/SECURITY.md).
+- <strong>Interested in our process?</strong> Read the [docs/COLLABORATION.md](docs/COLLABORATION.md).
+- <strong>What's coming next?</strong> Check the [docs/TODO.md](docs/TODO.md).
 
 ---
 
