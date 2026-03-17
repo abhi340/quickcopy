@@ -312,7 +312,10 @@ async function togglePublic(id, current) {
   try { 
     await updateDoc(doc(db, 'snippets', id), { isPublic: !current }); 
     if (!current) {
-      const shareUrl = `${window.location.origin}/public.html?id=${id}`;
+      // Create a full URL relative to the current page (works for subfolders)
+      const baseUrl = window.location.href.split('?')[0].split('#')[0];
+      const shareUrl = new URL(`public.html?id=${id}`, baseUrl).href;
+      
       navigator.clipboard.writeText(shareUrl);
       showToast('Public link copied! 🔗');
     } else {
