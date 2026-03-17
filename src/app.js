@@ -290,13 +290,13 @@ function renderSnippets() {
                   <div class="actions-group">
                     ${!isTrash ? `
                       <button class="icon-btn pin-btn ${item.pinned ? 'active' : ''}" data-id="${item.id}" data-pinned="${item.pinned}" title="Pin">${ICONS.pin}</button>
-                      <button class="icon-btn share-btn" data-id="${item.id}" data-public="${item.isPublic || false}" title="Public Share">🔗</button>
-                      <button class="icon-btn md-btn ${isMarkdown ? 'active' : ''}" data-id="${item.id}" data-md="${isMarkdown}" title="Toggle Markdown">M↓</button>
+                      <button class="icon-btn share-btn" data-id="${item.id}" data-public="${item.isPublic || false}" title="Public Share">${ICONS.share}</button>
+                      <button class="icon-btn md-btn ${isMarkdown ? 'active' : ''}" data-id="${item.id}" data-md="${isMarkdown}" title="Toggle Markdown">${ICONS.markdown}</button>
                       <button class="icon-btn edit-btn" data-id="${item.id}" data-text="${escapeHtml(item.text)}" title="Edit">${ICONS.edit}</button>
-                      <button class="icon-btn archive-btn" data-id="${item.id}" data-status="${item.status || 'active'}" title="${isArchived ? 'Unarchive' : 'Archive'}">📦</button>
+                      <button class="icon-btn archive-btn" data-id="${item.id}" data-status="${item.status || 'active'}" title="${isArchived ? 'Unarchive' : 'Archive'}">${ICONS.archive}</button>
                     ` : ''}
                     <button class="icon-btn delete-btn" data-id="${item.id}" data-status="${item.status || 'active'}" title="${isTrash ? 'Permanently Delete' : 'Move to Trash'}">${ICONS.delete}</button>
-                    ${isTrash ? `<button class="icon-btn restore-btn" data-id="${item.id}" title="Restore">♻️</button>` : ''}
+                    ${isTrash ? `<button class="icon-btn restore-btn" data-id="${item.id}" title="Restore">${ICONS.restore}</button>` : ''}
                     <button class="icon-btn copy-btn" data-index="${i}" title="Copy">${ICONS.copy}</button>
                   </div>
                 </div>
