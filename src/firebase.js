@@ -27,6 +27,12 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 import { firebaseConfig } from '../firebase-config.js';
 
+// Fail-safe: Check if the config is valid
+if (!firebaseConfig || !firebaseConfig.apiKey || firebaseConfig.apiKey.includes('FIREBASE_API_KEY')) {
+  console.error("🔥 Error: Firebase Configuration is missing or invalid! Ensure environment variables are set correctly.");
+  // Add a helpful visual indicator if possible, but at least prevent the loop
+}
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
