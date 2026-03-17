@@ -197,7 +197,7 @@ function renderApp() {
       </div>
       <div class="profile-dropdown-container">
         <button class="profile-btn" id="profile-btn">${ICONS.profile}</button>
-        <div class="dropdown-menu" id="dropdown-menu" style="display:none;">
+        <div class="dropdown-menu" id="dropdown-menu">
           <button class="dropdown-item" id="settings-btn">
             <span class="nav-icon">${ICONS.settings}</span> Settings
           </button>
@@ -221,10 +221,10 @@ function renderApp() {
       </div>
     </div>
 
-    <div style="display: flex; gap: 12px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 8px;">
-      <button class="btn btn-outline ${currentView === 'active' ? 'active' : ''}" id="view-active" style="width:auto; padding: 8px 16px; font-size: 0.85rem;">Active</button>
-      <button class="btn btn-outline ${currentView === 'archived' ? 'active' : ''}" id="view-archived" style="width:auto; padding: 8px 16px; font-size: 0.85rem;">Archived</button>
-      <button class="btn btn-outline ${currentView === 'trash' ? 'active' : ''}" id="view-trash" style="width:auto; padding: 8px 16px; font-size: 0.85rem;">Trash</button>
+    <div style="display: flex; gap: 12px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 8px;">
+      <button class="btn btn-outline ${currentView === 'active' ? 'active' : ''}" id="view-active" style="padding: 8px 16px; font-size: 0.85rem; width: auto;">Active</button>
+      <button class="btn btn-outline ${currentView === 'archived' ? 'active' : ''}" id="view-archived" style="padding: 8px 16px; font-size: 0.85rem; width: auto;">Archived</button>
+      <button class="btn btn-outline ${currentView === 'trash' ? 'active' : ''}" id="view-trash" style="padding: 8px 16px; font-size: 0.85rem; width: auto;">Trash</button>
     </div>
 
     <div id="tag-filters-container" style="display: flex; gap: 8px; margin-bottom: 24px; overflow-x: auto;"></div>
