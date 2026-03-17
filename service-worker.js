@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quickcopy-pro-v5';
+const CACHE_NAME = 'quickcopy-pro-v6';
 const ASSETS = [
   '/',
   'index.html',

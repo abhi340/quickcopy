@@ -8,56 +8,46 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
 </head>
 <body>
-    <div id="app">
+    <div id="app" style="max-width: 900px;">
         <div class="header">
             <button class="icon-btn" onclick="window.location.href='index.html'" style="width:auto; padding:0 12px; height:40px;">← Home</button>
             <h2 style="font-weight:800;">Platform Features</h2>
         </div>
 
         <div class="glass-card" style="line-height: 1.6;">
-            <h1 style="font-size: 2.5rem; font-weight: 900; margin-bottom: 20px; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Built for Power Users.</h1>
+            <h1 style="font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; margin-bottom: 20px; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Built for Power Users.</h1>
             <p style="font-size: 1.1rem; margin-bottom: 32px; color: var(--text-dim);">QuickCopy Pro is more than a clipboard—it's a high-performance ecosystem designed to organize your digital life.</p>
 
-            <div class="grid-layout-2">
+            <div class="grid-layout-2" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
                 <!-- Feature 1 -->
-                <div class="glass-card stats-card">
-                    <div class="card-title">☁️ Real-Time Cloud Sync</div>
-                    <p style="font-size: 0.85rem; color: var(--text-dim);">Every clip you save is instantly pushed to the cloud and synced across all your devices via our global edge network.</p>
+                <div class="glass-card" style="padding: 20px; border-radius: 16px;">
+                    <div class="feat-title">☁️ Real-Time Cloud Sync</div>
+                    <div class="feat-desc">Every clip you save is instantly pushed to the cloud and synced across all your devices.</div>
                 </div>
                 <!-- Feature 2 -->
-                <div class="glass-card stats-card">
-                    <div class="card-title">🏷️ Smart Auto-Tagging</div>
-                    <p style="font-size: 0.85rem; color: var(--text-dim);">Advanced regex detection automatically categorizes your clips into #Link or #Code snippets the moment you paste them.</p>
+                <div class="glass-card" style="padding: 20px; border-radius: 16px;">
+                    <div class="feat-title">🏷️ Smart Auto-Tagging</div>
+                    <div class="feat-desc">Advanced regex detection automatically categorizes your clips into #Link or #Code snippets.</div>
                 </div>
                 <!-- Feature 3 -->
-                <div class="glass-card stats-card">
-                    <div class="card-title">🔗 Rich Link Previews</div>
-                    <p style="font-size: 0.85rem; color: var(--text-dim);">URLs aren't just text anymore. We fetch favicons and render beautiful cards for every link you save.</p>
+                <div class="glass-card" style="padding: 20px; border-radius: 16px;">
+                    <div class="feat-title">🔗 Rich Link Previews</div>
+                    <div class="feat-desc">URLs aren't just text. We fetch favicons and render beautiful cards for every link you save.</div>
                 </div>
                 <!-- Feature 4 -->
-                <div class="glass-card stats-card">
-                    <div class="card-title">✍️ Native Markdown</div>
-                    <p style="font-size: 0.85rem; color: var(--text-dim);">Render complex notes, checklists, and code blocks with full Markdown support and XSS protection.</p>
+                <div class="glass-card" style="padding: 20px; border-radius: 16px;">
+                    <div class="feat-title">✍️ Native Markdown</div>
+                    <div class="feat-desc">Render complex notes and code blocks with full Markdown support and E2E security.</div>
                 </div>
                 <!-- Feature 5 -->
-                <div class="glass-card stats-card">
-                    <div class="card-title">⌨️ Vim-Style Navigation</div>
-                    <p style="font-size: 0.85rem; color: var(--text-dim);">Total keyboard control. Use j/k to move, y to copy, and / to search without ever touching your mouse.</p>
+                <div class="glass-card" style="padding: 20px; border-radius: 16px;">
+                    <div class="feat-title">⌨️ Vim-Style Navigation</div>
+                    <div class="feat-desc">Total keyboard control. Use j/k to move, y to copy, and / to search instantly.</div>
                 </div>
                 <!-- Feature 6 -->
-                <div class="glass-card stats-card">
-                    <div class="card-title">🔍 Search Highlighting</div>
-                    <p style="font-size: 0.85rem; color: var(--text-dim);">Instantly find what you need with real-time visual highlighting of matching terms across your entire library.</p>
-                </div>
-                <!-- Feature 7 -->
-                <div class="glass-card stats-card">
-                    <div class="card-title">📱 Installable PWA</div>
-                    <p style="font-size: 0.85rem; color: var(--text-dim);">Take QuickCopy anywhere. Fully installable on iOS, Android, and Desktop with offline caching support.</p>
-                </div>
-                <!-- Feature 8 -->
-                <div class="glass-card stats-card">
-                    <div class="card-title">🔑 Developer API</div>
-                    <p style="font-size: 0.85rem; color: var(--text-dim);">Generate personal API keys to interact with your data programmatically from the terminal or third-party scripts.</p>
+                <div class="glass-card" style="padding: 20px; border-radius: 16px;">
+                    <div class="feat-title">🔍 Search Highlighting</div>
+                    <div class="feat-desc">Instantly find what you need with real-time visual highlighting of matching terms.</div>
                 </div>
             </div>
 

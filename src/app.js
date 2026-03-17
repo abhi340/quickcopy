@@ -59,22 +59,22 @@ function renderLogin() {
           <div class="landing-feature">
             <div class="icon-box">${ICONS.shield}</div>
             <div>
-              <div style="font-weight: 800;">Zero-Trust Architecture</div>
-              <div style="font-size: 0.85rem; color: var(--text-dim); font-weight: 500;">Your data is encrypted and secure.</div>
+              <div class="feat-title">Zero-Trust Architecture</div>
+              <div class="feat-desc">Your data is encrypted and secure.</div>
             </div>
           </div>
           <div class="landing-feature">
             <div class="icon-box">${ICONS.markdown}</div>
             <div>
-              <div style="font-weight: 800;">Native Markdown</div>
-              <div style="font-size: 0.85rem; color: var(--text-dim); font-weight: 500;">Beautifully rendered notes and code.</div>
+              <div class="feat-title">Native Markdown</div>
+              <div class="feat-desc">Beautifully rendered notes and code.</div>
             </div>
           </div>
           <div class="landing-feature">
             <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></div>
             <div>
-              <div style="font-weight: 800;">Install Anywhere</div>
-              <div style="font-size: 0.85rem; color: var(--text-dim); font-weight: 500;">Full PWA support for Mobile and Desktop.</div>
+              <div class="feat-title">Install Anywhere</div>
+              <div class="feat-desc">Full PWA support for Mobile and Desktop.</div>
             </div>
           </div>
         </div>
@@ -82,11 +82,11 @@ function renderLogin() {
       <div class="landing-auth">
         <div class="auth-container" style="margin: 0; max-width: 100%; width: 100%;">
           <div class="glass-card">
-            <h2 style="font-weight: 900; margin-bottom: 20px; text-align: left;">Welcome Back</h2>
+            <h2>Welcome Back</h2>
             <input type="email" id="login-email" placeholder="Email" autocomplete="email" />
             <input type="password" id="login-password" placeholder="Password" autocomplete="current-password" />
             <button class="btn btn-primary" id="login-btn">Sign In</button>
-            <button class="btn btn-outline" id="forgot-password-btn">Forgot Password?</button>
+            <button class="btn btn-outline" id="forgot-password-btn" style="margin-top: 8px;">Forgot Password?</button>
             <button class="btn btn-outline" id="show-signup-btn">Create New Account</button>
             
             <div class="google-btn btn" id="google-signin-btn">
