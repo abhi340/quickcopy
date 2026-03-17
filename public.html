@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Public Snippet | QuickCopy</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-mode">
+  <div id="app">
+    <div style="text-align:center; padding:4rem;">
+      <p>Fetching shared snippet…</p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db, doc, getDoc } from './src/firebase.js';
+    import { escapeHtml } from './src/utils.js';
+
+    async function loadPublicSnippet() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const snippetId = urlParams.get('id');
+      
+      if (!snippetId) {
+        renderError('Invalid share link.');
+        return;
+      }
+
+      try {
+        const docRef = doc(db, 'snippets', snippetId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.isPublic) {
+            renderSnippet(data.text);
+          } else {
+            renderError('This snippet is no longer public.');
+          }
+        } else {
+          renderError('Snippet not found.');
+        }
+      } catch (err) {
+        renderError('Failed to load shared snippet.');
+      }
+    }
+
+    function renderSnippet(text) {
+      document.getElementById('app').innerHTML = `
+        <div class="header">
+          <h1 style="font-weight:900; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">QuickCopy Share</h1>
+        </div>
+        <div class="glass-card">
+          <div class="snippet-content" style="font-size: 1.2rem; min-height: 100px;">${escapeHtml(text)}</div>
+          <button class="btn btn-primary" id="copy-btn">Copy to Clipboard</button>
+          <p style="text-align:center; margin-top:20px; font-size:0.8rem; color:var(--text-dim);">shared via QuickCopy Pro</p>
+        </div>
+        <div style="text-align:center; margin-top:24px;">
+           <button class="btn btn-outline" onclick="window.location.href='index.html'">Create Your Own Account</button>
+        </div>
+      `;
+
+      document.getElementById('copy-btn').onclick = () => {
+        navigator.clipboard.writeText(text);
+        alert('Copied! 📋');
+      };
+    }
+
+    function renderError(msg) {
+      document.getElementById('app').innerHTML = `
+        <div class="glass-card" style="text-align:center; padding:40px;">
+          <h2 style="color:var(--accent);">Oops!</h2>
+          <p>${msg}</p>
+          <button class="btn btn-primary" style="margin-top:20px;" onclick="window.location.href='index.html'">Go to QuickCopy</button>
+        </div>
+      `;
+    }
+
+    loadPublicSnippet();
+  </script>
+</body>
+</html>

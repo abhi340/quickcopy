@@ -7,17 +7,12 @@ let currentUser = null;
 let snippets = [];
 let filteredSnippets = [];
 let searchTerm = '';
+let currentView = 'active'; // active, archived, trash
 
-// Expose these to window for potential inline calls or debugging
-window.setPaletteByName = (name) => {
-  const p = palettes.find(pal => pal.name === name);
-  if (p) { 
-    applyPalette(p); 
-    if (document.getElementById('profile-layout')) {
-      showProfile(); 
-    }
-  }
-};
+// Load Marked.js for Markdown support
+const script = document.createElement('script');
+script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+document.head.appendChild(script);
 
 // ===== AUTH RENDERERS =====
 function renderLogin() {
@@ -150,6 +145,12 @@ function renderApp() {
       </div>
     </div>
 
+    <div style="display: flex; gap: 12px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 8px;">
+      <button class="btn btn-outline ${currentView === 'active' ? 'active' : ''}" id="view-active" style="width:auto; padding: 8px 16px; font-size: 0.85rem;">Active</button>
+      <button class="btn btn-outline ${currentView === 'archived' ? 'active' : ''}" id="view-archived" style="width:auto; padding: 8px 16px; font-size: 0.85rem;">Archived</button>
+      <button class="btn btn-outline ${currentView === 'trash' ? 'active' : ''}" id="view-trash" style="width:auto; padding: 8px 16px; font-size: 0.85rem;">Trash</button>
+    </div>
+
     <div id="snippets-list-container">
       <!-- Snippets will be injected here -->
     </div>
@@ -171,6 +172,10 @@ function renderApp() {
       dropdown.style.display = 'none';
     }
   });
+
+  document.getElementById('view-active').onclick = () => { currentView = 'active'; renderSnippets(); };
+  document.getElementById('view-archived').onclick = () => { currentView = 'archived'; renderSnippets(); };
+  document.getElementById('view-trash').onclick = () => { currentView = 'trash'; renderSnippets(); };
 
   document.getElementById('settings-btn').onclick = (e) => {
     e.stopPropagation();
@@ -201,26 +206,54 @@ function renderSnippets() {
   const container = document.getElementById('snippets-list-container');
   if (!container) return;
 
-  filteredSnippets = snippets.filter(s => 
-    s.text.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Update active states
+  document.getElementById('view-active').classList.toggle('active', currentView === 'active');
+  document.getElementById('view-archived').classList.toggle('active', currentView === 'archived');
+  document.getElementById('view-trash').classList.toggle('active', currentView === 'trash');
+
+  filteredSnippets = snippets.filter(s => {
+    const matchesSearch = s.text.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = (s.status || 'active') === currentView;
+    return matchesSearch && matchesStatus;
+  });
 
   container.innerHTML = `
     <div id="snippets-list">
       ${filteredSnippets.length === 0 
-        ? `<div class="glass-card empty-state">No clips found. ${searchTerm ? 'Try a different search.' : 'Add your first one!'}</div>` 
+        ? `<div class="glass-card empty-state">No clips found in ${currentView}. ${searchTerm ? 'Try a different search.' : 'Add your first one!'}</div>` 
         : filteredSnippets.map((item, i) => {
             const type = getSnippetType(item.text);
+            const isTrash = item.status === 'trash';
+            const isArchived = item.status === 'archived';
+            const isMarkdown = item.isMarkdown || false;
+
+            let contentHtml = escapeHtml(item.text);
+            if (isMarkdown && window.marked) {
+              contentHtml = marked.parse(item.text);
+            }
+
             return `
               <div class="snippet-card ${item.pinned ? 'pinned' : ''}" data-index="${i}" title="Click to copy">
-                <span class="badge badge-${type}">${type}</span>
-                <div class="snippet-content">${escapeHtml(item.text)}</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                  <span class="badge badge-${type}">${type}</span>
+                  <div style="display: flex; gap: 4px;">
+                    ${item.isPublic ? '<span class="badge badge-link" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">Public</span>' : ''}
+                    ${isMarkdown ? '<span class="badge badge-code" style="background: rgba(99, 102, 241, 0.15); color: #818cf8;">MD</span>' : ''}
+                  </div>
+                </div>
+                <div class="snippet-content">${contentHtml}</div>
                 <div class="snippet-footer">
                   <div class="actions-group">
-                    <button class="icon-btn pin-btn ${item.pinned ? 'active' : ''}" data-id="${item.id}" data-pinned="${item.pinned}" title="Pin">${ICONS.pin}</button>
-                    <button class="icon-btn edit-btn" data-id="${item.id}" data-text="${escapeHtml(item.text)}" title="Edit">${ICONS.edit}</button>
+                    ${!isTrash ? `
+                      <button class="icon-btn pin-btn ${item.pinned ? 'active' : ''}" data-id="${item.id}" data-pinned="${item.pinned}" title="Pin">${ICONS.pin}</button>
+                      <button class="icon-btn share-btn" data-id="${item.id}" data-public="${item.isPublic || false}" title="Public Share">🔗</button>
+                      <button class="icon-btn md-btn ${isMarkdown ? 'active' : ''}" data-id="${item.id}" data-md="${isMarkdown}" title="Toggle Markdown">M↓</button>
+                      <button class="icon-btn edit-btn" data-id="${item.id}" data-text="${escapeHtml(item.text)}" title="Edit">${ICONS.edit}</button>
+                      <button class="icon-btn archive-btn" data-id="${item.id}" data-status="${item.status || 'active'}" title="${isArchived ? 'Unarchive' : 'Archive'}">📦</button>
+                    ` : ''}
+                    <button class="icon-btn delete-btn" data-id="${item.id}" data-status="${item.status || 'active'}" title="${isTrash ? 'Permanently Delete' : 'Move to Trash'}">${ICONS.delete}</button>
+                    ${isTrash ? `<button class="icon-btn restore-btn" data-id="${item.id}" title="Restore">♻️</button>` : ''}
                     <button class="icon-btn copy-btn" data-index="${i}" title="Copy">${ICONS.copy}</button>
-                    <button class="icon-btn delete-btn" data-id="${item.id}" title="Delete">${ICONS.delete}</button>
                   </div>
                 </div>
               </div>
@@ -239,104 +272,14 @@ function renderSnippets() {
     };
   });
 
-  document.querySelectorAll('.copy-btn').forEach(btn => {
-    btn.onclick = (e) => {
-      e.stopPropagation();
-      const idx = btn.dataset.index;
-      navigator.clipboard.writeText(filteredSnippets[idx].text);
-      showToast('Copied! 📋');
-    };
-  });
-
+  document.querySelectorAll('.copy-btn').forEach(btn => { btn.onclick = (e) => { e.stopPropagation(); const idx = btn.dataset.index; navigator.clipboard.writeText(filteredSnippets[idx].text); showToast('Copied! 📋'); }; });
   document.querySelectorAll('.pin-btn').forEach(btn => { btn.onclick = (e) => { e.stopPropagation(); togglePin(btn.dataset.id, btn.dataset.pinned === 'true'); }; });
+  document.querySelectorAll('.share-btn').forEach(btn => { btn.onclick = (e) => { e.stopPropagation(); togglePublic(btn.dataset.id, btn.dataset.public === 'true'); }; });
+  document.querySelectorAll('.md-btn').forEach(btn => { btn.onclick = (e) => { e.stopPropagation(); toggleMarkdown(btn.dataset.id, btn.dataset.md === 'true'); }; });
   document.querySelectorAll('.edit-btn').forEach(btn => { btn.onclick = (e) => { e.stopPropagation(); editSnippet(btn.dataset.id, btn.dataset.text); }; });
-  document.querySelectorAll('.delete-btn').forEach(btn => { btn.onclick = (e) => { e.stopPropagation(); deleteSnippet(btn.dataset.id); }; });
-}
-
-// ===== PROFILE DASHBOARD =====
-async function showProfile() {
-  const user = auth.currentUser || currentUser;
-  if (!user) {
-    renderLogin();
-    return;
-  }
-
-  let userName = user.email ? user.email.split('@')[0] : 'User';
-  try {
-    const q = query(collection(db, 'users'), where('uid', '==', user.uid));
-    const snap = await getDocs(q);
-    if (!snap.empty) userName = snap.docs[0].data().name || userName;
-  } catch (err) {
-    console.warn("Could not fetch user profile", err);
-  }
-
-  document.getElementById('app').innerHTML = `
-    <div class="header">
-      <button class="icon-btn" id="back-to-app" style="width:auto; padding:0 12px; height:40px;">← Back</button>
-      <h2 style="font-weight:800;">Account Settings</h2>
-    </div>
-    <div class="profile-layout" id="profile-layout">
-      <div class="glass-card profile-hero">
-        <div class="profile-avatar">${ICONS.profile}</div>
-        <h2 id="profile-name-display">${userName}</h2>
-        <p>${user.email}</p>
-        <button class="btn btn-outline" id="edit-name-btn" style="width:auto; margin: 10px auto; padding: 8px 16px;">Edit Name</button>
-        <div class="account-badge">PRO Account</div>
-      </div>
-
-      <div class="grid-layout-2">
-        <div class="glass-card stats-card">
-          <div class="card-title">${ICONS.stats} Usage Stats</div>
-          <div class="stat-item">
-            <span class="stat-label">Total Clips</span>
-            <span class="stat-value">${snippets.length}</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Pinned</span>
-            <span class="stat-value">${snippets.filter(s=>s.pinned).length}</span>
-          </div>
-        </div>
-
-        <div class="glass-card stats-card">
-          <div class="card-title">${ICONS.shield} Security</div>
-          <p class="security-note">Your data is cloud-synced and protected by Firebase security protocols.</p>
-          <button class="btn btn-outline" style="margin-top:10px; font-size:0.8rem;" id="verify-encryption-btn">Verify Encryption</button>
-        </div>
-      </div>
-
-      <div class="glass-card">
-        <h3 style="margin-bottom:16px;">Appearance Themes</h3>
-        <div class="palette-grid">
-          ${palettes.map(p => `
-            <div class="palette-swatch ${JSON.parse(localStorage.getItem('quickcopy_palette'))?.name === p.name ? 'active' : ''}" 
-                 style="background: linear-gradient(135deg, ${p.primary}, ${p.secondary})"
-                 onclick="window.setPaletteByName('${p.name}')"></div>
-          `).join('')}
-        </div>
-      </div>
-    </div>
-  `;
-
-  document.getElementById('back-to-app').onclick = renderApp;
-  document.getElementById('edit-name-btn').onclick = editProfileName;
-  document.getElementById('verify-encryption-btn').onclick = () => showToast('Cloud Guard Active! 🛡️');
-}
-
-async function editProfileName() {
-  const newName = prompt("Enter your name:");
-  if (newName && newName.trim()) {
-    try {
-      const q = query(collection(db, 'users'), where('uid', '==', auth.currentUser.uid));
-      const snap = await getDocs(q);
-      if (!snap.empty) {
-        await updateDoc(doc(db, 'users', snap.docs[0].id), { name: newName.trim() });
-      } else {
-        await addDoc(collection(db, 'users'), { uid: auth.currentUser.uid, name: newName.trim(), email: auth.currentUser.email, createdAt: new Date().toISOString() });
-      }
-      showToast('Name updated! ✨');
-      showProfile();
-    } catch (e) { showToast('Update failed.', '❌'); }
-  }
+  document.querySelectorAll('.archive-btn').forEach(btn => { btn.onclick = (e) => { e.stopPropagation(); updateStatus(btn.dataset.id, btn.dataset.status === 'archived' ? 'active' : 'archived'); }; });
+  document.querySelectorAll('.delete-btn').forEach(btn => { btn.onclick = (e) => { e.stopPropagation(); handleDeletion(btn.dataset.id, btn.dataset.status); }; });
+  document.querySelectorAll('.restore-btn').forEach(btn => { btn.onclick = (e) => { e.stopPropagation(); updateStatus(btn.dataset.id, 'active'); }; });
 }
 
 // ===== FIREBASE ACTIONS =====
@@ -349,6 +292,9 @@ async function addSnippet() {
       text: val, 
       userId: currentUser.uid, 
       pinned: false, 
+      status: 'active',
+      isPublic: false,
+      isMarkdown: false,
       createdAt: new Date().toISOString() 
     });
     input.value = ''; 
@@ -358,10 +304,45 @@ async function addSnippet() {
 }
 
 async function togglePin(id, current) {
+  try { await updateDoc(doc(db, 'snippets', id), { pinned: !current }); loadSnippets(); } 
+  catch (e) { showToast('Update Error.', '❌'); }
+}
+
+async function togglePublic(id, current) {
   try { 
-    await updateDoc(doc(db, 'snippets', id), { pinned: !current }); 
+    await updateDoc(doc(db, 'snippets', id), { isPublic: !current }); 
+    if (!current) {
+      const shareUrl = `${window.location.origin}/public.html?id=${id}`;
+      navigator.clipboard.writeText(shareUrl);
+      showToast('Public link copied! 🔗');
+    } else {
+      showToast('Link disabled.');
+    }
     loadSnippets(); 
-  } catch (e) { showToast('Update Error.', '❌'); }
+  } catch (e) { showToast('Sharing Error.', '❌'); }
+}
+
+async function toggleMarkdown(id, current) {
+  try { await updateDoc(doc(db, 'snippets', id), { isMarkdown: !current }); loadSnippets(); } 
+  catch (e) { showToast('MD Error.', '❌'); }
+}
+
+async function updateStatus(id, newStatus) {
+  try { await updateDoc(doc(db, 'snippets', id), { status: newStatus }); loadSnippets(); } 
+  catch (e) { showToast('Status Error.', '❌'); }
+}
+
+async function handleDeletion(id, currentStatus) {
+  if (currentStatus === 'trash') {
+    if (confirm('Permanently delete from cloud?')) { 
+      await deleteDoc(doc(db, 'snippets', id)); 
+      showToast('Wiped from Cloud.'); 
+      loadSnippets(); 
+    }
+  } else {
+    await updateStatus(id, 'trash');
+    showToast('Moved to Trash.');
+  }
 }
 
 async function editSnippet(id, old) {
@@ -369,14 +350,6 @@ async function editSnippet(id, old) {
   if (res && res.trim()) { 
     await updateDoc(doc(db, 'snippets', id), { text: res.trim() }); 
     showToast('Cloud Sync Updated!'); 
-    loadSnippets(); 
-  }
-}
-
-async function deleteSnippet(id) {
-  if (confirm('Permanently delete from cloud?')) { 
-    await deleteDoc(doc(db, 'snippets', id)); 
-    showToast('Wiped from Cloud.'); 
     loadSnippets(); 
   }
 }
@@ -389,35 +362,42 @@ async function loadSnippets() {
     snippets = [];
     snap.forEach(d => snippets.push({ id: d.id, ...d.data() }));
     snippets.sort((a, b) => a.pinned === b.pinned ? new Date(b.createdAt) - new Date(a.createdAt) : (a.pinned ? -1 : 1));
-    
-    if (document.getElementById('snippets-list-container')) {
-      renderSnippets();
-    } else if (document.getElementById('app').querySelector('.user-greeting')) {
-      // Already in app view, just update list container if needed (usually handled above)
-      renderSnippets();
-    } else {
-      renderApp();
-    }
-  } catch (e) {
-    console.error("Snippets load error", e);
-  }
+    renderSnippets();
+  } catch (e) { console.error("Snippets load error", e); }
 }
 
 function confirmDeleteAccount() {
   if (confirm('DANGER: Wipe ALL cloud data and delete account?')) {
-    deleteUser(auth.currentUser).then(() => {
-      window.location.reload();
-    }).catch(e => showError("Failed to delete account. You may need to re-login first."));
+    deleteUser(auth.currentUser).then(() => { window.location.reload(); }).catch(e => showError("Failed to delete account."));
   }
 }
 
+// ===== KEYBOARD SHORTCUTS =====
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.key === 'Enter') {
+    if (document.activeElement.id === 'new-snippet') addSnippet();
+  }
+  if (e.ctrlKey && e.key === 'f') {
+    e.preventDefault();
+    document.getElementById('search-input')?.focus();
+  }
+  if (e.altKey && e.key >= '1' && e.key <= '9') {
+    const idx = parseInt(e.key) - 1;
+    if (filteredSnippets[idx]) {
+      navigator.clipboard.writeText(filteredSnippets[idx].text);
+      showToast(`Snippet #${e.key} Copied! 📋`);
+    }
+  }
+  if (e.key === 'Escape') {
+    searchTerm = '';
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) searchInput.value = '';
+    renderSnippets();
+  }
+});
+
 // ===== INITIALIZATION =====
 onAuthStateChanged(auth, (u) => { 
-  if (u) { 
-    currentUser = u; 
-    loadSnippets(); 
-  } else { 
-    currentUser = null; 
-    renderLogin(); 
-  } 
+  if (u) { currentUser = u; loadSnippets(); } 
+  else { currentUser = null; renderLogin(); } 
 });
