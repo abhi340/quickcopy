@@ -1,40 +1,47 @@
-# Security Policy
+# QuickCopy Pro - Security Configuration
 
-## Supported Versions
+## Critical Action Required: Firestore Security Rules
 
-The following versions of QuickCopy are currently being supported with security updates:
+As part of our security audit, we identified a potential **IDOR (Insecure Direct Object Reference)** vulnerability in the standard client-side Firebase setup. 
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
-| < 1.0   | :x:                |
+To prevent malicious users from updating or deleting snippets they do not own, you **must** apply these security rules in your Firebase Console.
 
-## Reporting a Vulnerability
+### How to apply these rules:
+1. Go to your [Firebase Console](https://console.firebase.google.com/).
+2. Select your project (`quickcopy-d4d0f`).
+3. Click on **Firestore Database** in the left sidebar.
+4. Click on the **Rules** tab.
+5. Replace the existing rules with the following code:
 
-**Please do not open a public GitHub issue for security vulnerabilities.**
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Users Collection
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.uid;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.uid;
+    }
 
-If you discover a security vulnerability within QuickCopy, please report it privately. You can reach the maintainer via:
+    // Snippets Collection
+    match /snippets/{snippetId} {
+      // Anyone can read a snippet IF it is marked as public
+      // Otherwise, only the owner can read it
+      allow read: if (resource.data.isPublic == true) || (request.auth != null && request.auth.uid == resource.data.userId);
+      
+      // Only authenticated users can create snippets, and they must assign their own ID
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      
+      // ONLY the owner of the snippet can update or delete it
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+  }
+}
+```
 
-*   **Email:** [Your Email Address - Please Update This]
-*   **GitHub Private Message:** [Link to your profile]
+6. Click **Publish**.
 
-We aim to acknowledge all security reports within 48 hours and provide a fix or mitigation strategy within 7 business days.
-
-## Our Security Philosophy
-
-QuickCopy is built with a **Zero-Trust** mindset. While we prioritize convenience, we implement the following measures to ensure data integrity:
-
-1.  **Firebase Security Rules:** All database operations are restricted to the authenticated owner of the data. No user can read or write snippets belonging to another UID.
-2.  **Short-Lived Sessions:** Authentication persistence is set to `none`, meaning users are required to re-authenticate on page refresh/reload to prevent unauthorized access on shared devices.
-3.  **Credential Protection:** We advocate for API Key restrictions (domain whitelisting) to ensure that exposed configuration files cannot be used outside of authorized environments.
-
-## Secure Configuration
-
-If you are forking or deploying this project, ensure you:
-1.  **Restrict your Google API Keys** to your specific deployment domains in the Google Cloud Console.
-2.  **Enable Firebase App Check** if you anticipate high traffic or potential abuse.
-3.  **Regularly audit** your Firebase Authentication users and Firestore data usage.
-
----
-
-> Thank you for helping keep QuickCopy safe for everyone! 🛡️
+### Why is this necessary?
+Without these rules, the backend database blindly trusts the client. A hacker could use the browser console to run `deleteDoc(doc(db, 'snippets', 'SOME_OTHER_USERS_ID'))` and your database would allow it. These rules enforce authorization at the server level, rendering IDOR attacks impossible.

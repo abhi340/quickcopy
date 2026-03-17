@@ -14,6 +14,11 @@ const script = document.createElement('script');
 script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
 document.head.appendChild(script);
 
+// Load DOMPurify for XSS protection
+const purifyScript = document.createElement('script');
+purifyScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js';
+document.head.appendChild(purifyScript);
+
 // ===== AUTH RENDERERS =====
 function renderLogin() {
   const appEl = document.getElementById('app');
@@ -228,8 +233,9 @@ function renderSnippets() {
             const isMarkdown = item.isMarkdown || false;
 
             let contentHtml = escapeHtml(item.text);
-            if (isMarkdown && window.marked) {
-              contentHtml = marked.parse(item.text);
+            if (isMarkdown && window.marked && window.DOMPurify) {
+              const rawHtml = marked.parse(item.text);
+              contentHtml = DOMPurify.sanitize(rawHtml);
             }
 
             return `
