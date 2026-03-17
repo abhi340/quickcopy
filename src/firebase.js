@@ -9,7 +9,9 @@ import {
   signInWithPopup,
   sendPasswordResetEmail,
   deleteUser,
-  updateEmail
+  updateEmail,
+  browserSessionPersistence,
+  setPersistence
 } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
 import {
   getFirestore,
@@ -29,8 +31,8 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Security: disable persistence (force re-login on refresh)
-auth.setPersistence('none').catch(err => console.warn('Persistence warning:', err));
+// Security: Use session persistence (session cleared when browser/tab closes)
+setPersistence(auth, browserSessionPersistence).catch(err => console.warn('Persistence warning:', err));
 
 export {
   auth, db,

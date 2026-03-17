@@ -111,9 +111,16 @@ function renderSignup() {
 }
 
 // ===== MAIN APP RENDERER =====
-function renderApp() {
+async function renderApp() {
   if (!currentUser) return;
-  const displayName = currentUser.email ? currentUser.email.split('@')[0] : 'User';
+  
+  let displayName = currentUser.email ? currentUser.email.split('@')[0] : 'User';
+  try {
+    const q = query(collection(db, 'users'), where('uid', '==', currentUser.uid));
+    const snap = await getDocs(q);
+    if (!snap.empty) displayName = snap.docs[0].data().name || displayName;
+  } catch (err) {}
+
   const safeDisplayName = escapeHtml(displayName);
   const safeSearchTerm = escapeHtml(searchTerm);
 
