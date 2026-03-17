@@ -8,6 +8,7 @@ let snippets = [];
 let filteredSnippets = [];
 let searchTerm = '';
 let currentView = 'active'; // active, archived, trash
+let hasRendered = false; // Prevent multiple renders
 
 // Load Marked.js & DOMPurify
 function loadExternalScripts() {
@@ -31,6 +32,7 @@ function renderLogin() {
   const appEl = document.getElementById('app');
   if (!appEl) return;
   
+  hasRendered = false; // Reset on logout
   appEl.innerHTML = `
     <div class="auth-container">
       <h1>QuickCopy</h1>
@@ -120,6 +122,8 @@ function renderSignup() {
 // ===== MAIN APP RENDERER =====
 function renderApp() {
   if (!currentUser) return;
+  if (hasRendered) return; // Important: prevent looping if renderApp is called multiple times
+  hasRendered = true;
   
   const initialName = currentUser.email ? currentUser.email.split('@')[0] : 'User';
   const safeDisplayName = escapeHtml(initialName);
