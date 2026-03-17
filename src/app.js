@@ -16,7 +16,14 @@ let filteredSnippets = [];
 let searchTerm = '';
 let currentView = 'active'; // active, archived, trash
 let currentTag = 'all'; // all, #Link, #Code
+let selectedIdx = -1; // Vim-style navigation
 let hasRendered = false; // Prevent multiple renders
+
+function highlightSearch(text, term) {
+  if (!term || term.length < 2) return text;
+  const regex = new RegExp(`(${term})`, 'gi');
+  return text.replace(regex, '<span class="search-highlight">$1</span>');
+}
 
 // Load Marked.js & DOMPurify
 function loadExternalScripts() {
@@ -349,7 +356,7 @@ function renderSnippets() {
             const isArchived = item.status === 'archived';
             const isMarkdown = item.isMarkdown || false;
 
-            let contentHtml = escapeHtml(item.text);
+            let contentHtml = highlightSearch(escapeHtml(item.text), searchTerm);
             let richMediaHtml = '';
 
             if (type === 'link' && item.text.startsWith('http')) {
@@ -371,11 +378,14 @@ function renderSnippets() {
               try {
                 const rawHtml = marked.parse(item.text);
                 contentHtml = DOMPurify.sanitize(rawHtml);
+                if (searchTerm && searchTerm.length >= 2) {
+                   contentHtml = highlightSearch(contentHtml, searchTerm);
+                }
               } catch (e) { console.error("MD Error", e); }
             }
 
             return `
-              <div class="snippet-card ${item.pinned ? 'pinned' : ''}" data-index="${i}" title="Click to copy">
+              <div class="snippet-card ${item.pinned ? 'pinned' : ''} ${selectedIdx === i ? 'selected' : ''}" data-index="${i}" title="Click to copy">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                   <div style="display: flex; gap: 4px; flex-wrap: wrap;">
                     <span class="badge badge-${type}">${type}</span>
@@ -532,10 +542,35 @@ document.addEventListener('keydown', (e) => {
   if (e.ctrlKey && e.key === 'Enter') {
     if (document.activeElement.id === 'new-snippet') addSnippet();
   }
-  if (e.ctrlKey && e.key === 'f') {
-    e.preventDefault();
-    document.getElementById('search-input')?.focus();
+  
+  // Power User Search
+  if (e.ctrlKey && e.key === 'f' || e.key === '/') {
+    if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+      e.preventDefault();
+      document.getElementById('search-input')?.focus();
+    }
   }
+
+  // Vim-style Navigation
+  if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+    if (e.key === 'j') {
+      e.preventDefault();
+      selectedIdx = Math.min(selectedIdx + 1, filteredSnippets.length - 1);
+      renderSnippets();
+      document.querySelector(`[data-index="${selectedIdx}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    if (e.key === 'k') {
+      e.preventDefault();
+      selectedIdx = Math.max(selectedIdx - 1, 0);
+      renderSnippets();
+      document.querySelector(`[data-index="${selectedIdx}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    if (e.key === 'y' && selectedIdx !== -1) {
+      navigator.clipboard.writeText(filteredSnippets[selectedIdx].text);
+      showToast(`Copied snippet #${selectedIdx + 1} 📋`);
+    }
+  }
+
   if (e.altKey && e.key >= '1' && e.key <= '9') {
     const idx = parseInt(e.key) - 1;
     if (filteredSnippets[idx]) {
@@ -545,8 +580,10 @@ document.addEventListener('keydown', (e) => {
   }
   if (e.key === 'Escape') {
     searchTerm = '';
+    selectedIdx = -1;
     const searchInput = document.getElementById('search-input');
     if (searchInput) searchInput.value = '';
+    if (document.activeElement.tagName === 'INPUT') document.activeElement.blur();
     renderSnippets();
   }
 });
