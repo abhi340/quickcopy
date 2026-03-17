@@ -3,6 +3,13 @@ import { ICONS } from './icons.js';
 import { palettes, applyPalette, toggleTheme } from './theme.js';
 import { showToast, escapeHtml, showError, getFriendlyAuthError, getSnippetType } from './utils.js';
 
+// Initialization Check
+console.log("🚀 QuickCopy Pro Initializing...");
+if (window.location.protocol === 'file:') {
+  console.error("🛑 SECURITY ERROR: Modules are blocked on file:// protocol.");
+  alert("QuickCopy Pro cannot run via file://. Please use a local server (like Live Server or 'npx serve').");
+}
+
 let currentUser = null;
 let snippets = [];
 let filteredSnippets = [];
@@ -12,6 +19,7 @@ let hasRendered = false; // Prevent multiple renders
 
 // Load Marked.js & DOMPurify
 function loadExternalScripts() {
+  console.log("📦 Loading external scripts...");
   if (!document.getElementById('marked-js')) {
     const s = document.createElement('script');
     s.id = 'marked-js';
@@ -29,6 +37,7 @@ loadExternalScripts();
 
 // ===== AUTH RENDERERS =====
 function renderLogin() {
+  console.log("🔑 Rendering Login Screen...");
   const appEl = document.getElementById('app');
   if (!appEl) return;
   
