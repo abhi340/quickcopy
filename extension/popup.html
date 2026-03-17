@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      width: 300px;
+      padding: 16px;
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #ffffff;
+      color: #1e293b;
+    }
+    .header {
+      font-weight: 800;
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      color: #6366f1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      font-size: 0.9rem;
+      resize: none;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #6366f1;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    button:hover { opacity: 0.9; }
+    .status {
+      margin-top: 8px;
+      font-size: 0.75rem;
+      text-align: center;
+      color: #64748b;
+    }
+    .config-link {
+      display: block;
+      margin-top: 12px;
+      text-align: center;
+      font-size: 0.7rem;
+      color: #94a3b8;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">🚀 QuickCopy Pro</div>
+  <textarea id="snippet-text" placeholder="Paste anything to sync..."></textarea>
+  <button id="sync-btn">Sync to Cloud</button>
+  <div class="status" id="status">Ready to sync.</div>
+  <a href="#" id="open-settings" class="config-link">Configure API Key</a>
+
+  <script src="popup.js"></script>
+</body>
+</html>

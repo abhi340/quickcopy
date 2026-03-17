@@ -137,6 +137,31 @@
             </div>
           </div>
 
+          <!-- Professional Toolkit -->
+          <div class="grid-layout-2">
+            <div class="glass-card">
+              <div class="card-title">${ICONS.settings} Developer Mode</div>
+              <p class="security-note">Generate a personal API key for CLI access.</p>
+              <div id="api-key-container" style="display: flex; gap: 8px; margin-top: 10px;">
+                <input type="text" id="api-key-display" value="••••••••••••••••" readonly style="flex: 1; background: rgba(0,0,0,0.1); border: 1px solid var(--glass-border); padding: 8px; border-radius: 8px; font-family: monospace; font-size: 0.8rem; color: var(--text-dim);" />
+                <button class="btn btn-primary" id="gen-api-key-btn" style="padding: 0 12px; font-size: 0.8rem;">Generate</button>
+              </div>
+            </div>
+
+            <div class="glass-card">
+              <div class="card-title">🔐 Advanced Security</div>
+              <p class="security-note">Enable local AES-256 encryption for your snippets.</p>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
+                <span style="font-size: 0.9rem; font-weight: 600;">E2E Encryption</span>
+                <label class="switch">
+                  <input type="checkbox" id="encryption-toggle" disabled />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+              <p style="font-size: 0.7rem; color: var(--accent); margin-top: 8px;">* Coming soon in the next Pro update.</p>
+            </div>
+          </div>
+
           <!-- Themes -->
           <div class="glass-card">
             <h3 style="margin-bottom:16px;">Appearance Themes</h3>
@@ -173,7 +198,11 @@
       document.getElementById('export-btn').onclick = exportClips;
       document.getElementById('clear-all-btn').onclick = clearAllClips;
       document.getElementById('delete-acc-btn').onclick = confirmDeleteAccount;
+      document.getElementById('gen-api-key-btn').onclick = generateApiKey;
       
+      // Load existing API key if exists
+      loadApiKey();
+
       document.querySelectorAll('.palette-swatch').forEach(swatch => {
         swatch.onclick = () => {
           const name = swatch.dataset.name;
@@ -184,6 +213,34 @@
           }
         };
       });
+    }
+
+    async function generateApiKey() {
+      const key = 'qc_' + Math.random().toString(36).substr(2, 9) + Math.random().toString(36).substr(2, 9);
+      try {
+        const q = query(collection(db, 'users'), where('uid', '==', currentUser.uid));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          await updateDoc(doc(db, 'users', snap.docs[0].id), { apiKey: key });
+          document.getElementById('api-key-display').value = key;
+          showToast('New API Key generated! 🔑');
+        } else {
+          // If user doc doesn't exist yet, create it
+          await addDoc(collection(db, 'users'), { uid: currentUser.uid, name: currentUser.email.split('@')[0], email: currentUser.email, apiKey: key, createdAt: new Date().toISOString() });
+          document.getElementById('api-key-display').value = key;
+          showToast('New API Key generated! 🔑');
+        }
+      } catch (e) { showToast('Generation failed.', '❌'); }
+    }
+
+    async function loadApiKey() {
+      try {
+        const q = query(collection(db, 'users'), where('uid', '==', currentUser.uid));
+        const snap = await getDocs(q);
+        if (!snap.empty && snap.docs[0].data().apiKey) {
+          document.getElementById('api-key-display').value = snap.docs[0].data().apiKey;
+        }
+      } catch (err) {}
     }
 
     async function editProfileName() {
@@ -211,6 +268,7 @@
           text: d.data().text,
           status: d.data().status || 'active',
           pinned: d.data().pinned || false,
+          tags: d.data().tags || [],
           createdAt: d.data().createdAt
         }));
         
