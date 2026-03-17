@@ -1,9 +1,10 @@
-const CACHE_NAME = 'quickcopy-pro-v4';
+const CACHE_NAME = 'quickcopy-pro-v5';
 const ASSETS = [
   '/',
   'index.html',
   'settings.html',
   'about.html',
+  'features.html',
   'privacy.html',
   'changelog.html',
   'style.css',

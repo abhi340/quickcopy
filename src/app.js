@@ -236,6 +236,7 @@ function renderApp() {
     <footer class="app-footer">
       <div class="footer-links">
         <a href="about.html">About</a>
+        <a href="features.html">Features</a>
         <a href="privacy.html">Privacy</a>
         <a href="changelog.html">Changelog</a>
       </div>
