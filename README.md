@@ -77,4 +77,4 @@ If QuickCopy Pro has helped your workflow, consider supporting the journey!
 
 ---
 
-👉 **[Launch QuickCopy Pro Live](https://quickcopy.pages.dev/)**
+👉 **[Launch QuickCopy Pro Live]([https://quickcopy.pages.dev/](https://quickcopy.abhicm019.workers.dev/))**
