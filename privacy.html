@@ -3,39 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy | QuickCopy</title>
+    <title>Privacy Policy | QuickCopy Pro</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
 </head>
 <body>
-    <div id="app">
-        <div class="header">
-            <button class="icon-btn" onclick="window.location.href='index.html'" style="width:auto; padding:0 12px; height:40px;">← Home</button>
-            <h2 style="font-weight:800;">Privacy Policy</h2>
+    <div id="app" style="max-width: 900px;">
+        <div class="header" style="flex-direction: column; align-items: stretch; gap: 12px; padding: 12px 16px; position: sticky; top: 10px; z-index: 1000; background: var(--glass-heavy);">
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <button class="btn btn-outline" onclick="window.location.href='index.html'" style="width:auto; padding:0 16px; height:38px; font-size: 0.85rem; border-radius: 10px;">← Home</button>
+                <div style="opacity: 0.5; font-size: 0.7rem; font-weight: 800; letter-spacing: 1px;">QUICKCOPY PRO</div>
+            </div>
+            <h2 style="font-weight:900; font-size: 1.5rem; margin-top: 4px;">Data Sovereignty</h2>
         </div>
 
         <div class="glass-card" style="line-height: 1.6;">
-            <h1 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 20px; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Your Data, Your Control.</h1>
-            <p style="margin-bottom: 20px;">At QuickCopy, your privacy is our top priority. We believe in transparency and giving you full control over your information.</p>
+            <h1 style="font-size: clamp(2.2rem, 5vw, 3rem); font-weight: 900; margin-bottom: 20px; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Your Data, Your Control.</h1>
+            <p style="margin-bottom: 20px; font-size: 1.1rem;">At QuickCopy Pro, we believe that privacy is a fundamental human right. Our ecosystem is built from the ground up to ensure that you remain the sole owner of your information.</p>
 
-            <h3 style="margin-top: 24px; margin-bottom: 12px;">What We Collect</h3>
-            <ul style="margin-left: 20px; margin-bottom: 20px;">
-                <li><b>Snippets:</b> Your pasted text and links are stored securely in the cloud via Firebase Firestore.</li>
-                <li><strong>Authentication:</strong> We use Firebase Auth to manage your account and secure your data.</li>
-            </ul>
+            <h3 style="margin-top: 32px; margin-bottom: 12px; font-weight: 800;">1. Zero-Knowledge Collection</h3>
+            <p style="margin-bottom: 16px; color: var(--text-dim);">We only store what is absolutely necessary for the app to function. This includes your snippets (encrypted in transit and at rest) and basic account metadata required for synchronization.</p>
 
-            <h3 style="margin-top: 24px; margin-bottom: 12px;">Data Protection</h3>
-            <p style="margin-bottom: 20px;">We use industry-standard encryption protocols provided by Google Cloud (Firebase). Your snippets are private to your account and cannot be accessed by other users.</p>
+            <h3 style="margin-top: 24px; margin-bottom: 12px; font-weight: 800;">2. Industry-Standard Protection</h3>
+            <p style="margin-bottom: 16px; color: var(--text-dim);">Your data is secured using Google's global infrastructure. We implement Firebase Security Rules that ensure only <u>your specific authenticated UID</u> can read or write to your data silo.</p>
 
-            <h3 style="margin-top: 24px; margin-bottom: 12px;">Your Rights</h3>
-            <p style="margin-bottom: 20px;">You have the right to delete your account and all associated snippets at any time. This action is permanent and wipes all data from our cloud servers.</p>
+            <h3 style="margin-top: 24px; margin-bottom: 12px; font-weight: 800;">3. Total Data Erasure</h3>
+            <p style="margin-bottom: 16px; color: var(--text-dim);">We provide a "Nuclear Option" in your settings. Clicking "Delete Account" instantly and permanently wipes your profile and all associated snippets from our cloud database. There are no backups kept after this action.</p>
 
-            <div class="glass-card stats-card" style="margin-top: 32px; background: rgba(244, 63, 94, 0.1); border-color: rgba(244, 63, 94, 0.3);">
-                <div class="card-title" style="color: #fb7185;">⚠️ Data Deletion</div>
-                <p style="font-size: 0.85rem; color: #fb7185;">Once deleted, your snippets cannot be recovered. Please ensure you have backups of important information.</p>
+            <div class="glass-card stats-card" style="margin-top: 32px; background: rgba(244, 63, 94, 0.05); border: 1px solid rgba(244, 63, 94, 0.2);">
+                <div class="card-title" style="color: #fb7185; font-weight: 800;">⚠️ Safety Notice</div>
+                <p style="font-size: 0.85rem; color: #fb7185;">QuickCopy Pro does not sell, trade, or share your data with third-party advertisers. Your clipboard is your private space.</p>
             </div>
             
-            <p style="text-align: center; margin-top: 40px; font-size: 0.8rem; color: var(--text-dim);">Last updated: March 17, 2026</p>
+            <p style="text-align: center; margin-top: 40px; font-size: 0.8rem; color: var(--text-dim); font-weight: 600;">Last Policy Audit: March 18, 2026</p>
         </div>
 
         <footer class="app-footer">

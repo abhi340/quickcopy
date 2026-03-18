@@ -3,36 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us | QuickCopy</title>
+    <title>About Us | QuickCopy Pro</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
 </head>
 <body>
-    <div id="app">
-        <div class="header">
-            <button class="icon-btn" onclick="window.location.href='index.html'" style="width:auto; padding:0 12px; height:40px;">← Home</button>
-            <h2 style="font-weight:800;">About QuickCopy</h2>
+    <div id="app" style="max-width: 900px;">
+        <div class="header" style="flex-direction: column; align-items: stretch; gap: 12px; padding: 12px 16px; position: sticky; top: 10px; z-index: 1000; background: var(--glass-heavy);">
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <button class="btn btn-outline" onclick="window.location.href='index.html'" style="width:auto; padding:0 16px; height:38px; font-size: 0.85rem; border-radius: 10px;">← Home</button>
+                <div style="opacity: 0.5; font-size: 0.7rem; font-weight: 800; letter-spacing: 1px;">QUICKCOPY PRO</div>
+            </div>
+            <h2 style="font-weight:900; font-size: 1.5rem; margin-top: 4px;">About the Mission</h2>
         </div>
 
         <div class="glass-card" style="line-height: 1.6;">
-            <h1 style="font-size: 2.5rem; font-weight: 900; margin-bottom: 20px; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Our Mission</h1>
-            <p style="font-size: 1.1rem; margin-bottom: 24px; color: var(--text);">QuickCopy was born out of a simple need: <strong>Seamless Clipboard Syncing</strong>. We believe that your data should follow you, not the other way around. Whether you're a developer, a writer, or a student, QuickCopy is built to be your ultimate digital companion.</p>
+            <h1 style="font-size: clamp(2.2rem, 5vw, 3rem); font-weight: 900; margin-bottom: 20px; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Your Digital Second Brain.</h1>
+            <p style="font-size: 1.15rem; margin-bottom: 24px; color: var(--text); font-weight: 500;">QuickCopy Pro was built for those who live in the terminal, the editor, and the browser. We believe that your ideas, code snippets, and critical links shouldn't be trapped on a single device.</p>
             
-            <h2 style="margin-top: 32px; margin-bottom: 16px;">The "Pro" Standard</h2>
-            <p style="margin-bottom: 16px;">We don't just store text; we provide a high-performance, secure, and beautiful environment for your most important clips and links. Every feature is designed with speed and aesthetics in mind, utilizing modern Glassmorphism principles.</p>
+            <h2 style="margin-top: 32px; margin-bottom: 16px; font-weight: 800;">Privacy by Design</h2>
+            <p style="margin-bottom: 16px;">In an era of data harvesting, QuickCopy Pro stands apart. We utilize <strong>Zero-Trust Architecture</strong> and industry-leading encryption to ensure that your clips are seen by only one person: <u>You</u>.</p>
 
-            <div class="grid-layout-2" style="margin-top: 40px;">
-                <div class="glass-card stats-card">
-                    <div class="card-title">🚀 Fast</div>
-                    <p style="font-size: 0.85rem; color: var(--text-dim);">Built for speed with real-time cloud sync and instant search.</p>
+            <div class="grid-layout-2" style="margin-top: 40px; gap: 20px;">
+                <div class="glass-card" style="padding: 24px; border-radius: 20px;">
+                    <div style="font-size: 1.5rem; margin-bottom: 10px;">⚡</div>
+                    <div class="feat-title">High-Velocity Sync</div>
+                    <p style="font-size: 0.9rem; color: var(--text-dim);">Global edge caching ensures your data is synced across the world in milliseconds.</p>
                 </div>
-                <div class="glass-card stats-card">
-                    <div class="card-title">🔒 Secure</div>
-                    <p style="font-size: 0.85rem; color: var(--text-dim);">Protected by Firebase's industry-standard security protocols.</p>
+                <div class="glass-card" style="padding: 24px; border-radius: 20px;">
+                    <div style="font-size: 1.5rem; margin-bottom: 10px;">⌨️</div>
+                    <div class="feat-title">Developer First</div>
+                    <p style="font-size: 0.9rem; color: var(--text-dim);">Full Vim-style navigation and Markdown rendering built directly into the core.</p>
                 </div>
             </div>
 
-            <p style="text-align: center; margin-top: 40px; font-weight: 700;">Built with ❤️ for power users.</p>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; margin-top: 60px;">
+                <button id="joke-btn-about" class="btn btn-primary" style="background: #f59e0b;">
+                    <span style="font-size: 1.1rem; margin-right: 8px;">🎁</span> Donate
+                </button>
+                <div style="text-align: center; padding: 30px; background: var(--glass); border-radius: 24px; border: 1px solid var(--glass-border); width: 100%;">
+                    <p style="font-weight: 800; font-size: 1.1rem; margin-bottom: 8px;">Version 2.5.6 "Polished Dashboard"</p>
+                    <p style="font-size: 0.85rem; color: var(--text-dim);">Designed and maintained with ❤️ for the global tech community.</p>
+                </div>
+            </div>
         </div>
 
         <footer class="app-footer">
@@ -48,7 +61,11 @@
 
     <script type="module">
         import { initTheme } from './src/theme.js';
+        import { showJokeModal } from './src/utils.js';
         initTheme();
+        
+        const jBtnAbout = document.getElementById('joke-btn-about');
+        if (jBtnAbout) jBtnAbout.onclick = showJokeModal;
     </script>
 </body>
 </html>

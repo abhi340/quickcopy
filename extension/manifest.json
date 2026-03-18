@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "QuickCopy Pro Cloud Sync",
-  "version": "1.0.0",
+  "version": "2.5.7",
   "description": "Instantly sync text and links to your QuickCopy Pro cloud clipboard.",
   "permissions": ["storage", "activeTab", "clipboardRead"],
   "action": {

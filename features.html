@@ -8,50 +8,59 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
 </head>
 <body>
-    <div id="app" style="max-width: 900px;">
-        <div class="header">
-            <button class="icon-btn" onclick="window.location.href='index.html'" style="width:auto; padding:0 12px; height:40px;">← Home</button>
-            <h2 style="font-weight:800;">Platform Features</h2>
+    <div id="app" style="max-width: 1000px;">
+        <div class="header" style="flex-direction: column; align-items: stretch; gap: 12px; padding: 12px 16px; position: sticky; top: 10px; z-index: 1000; background: var(--glass-heavy);">
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <button class="btn btn-outline" onclick="window.location.href='index.html'" style="width:auto; padding:0 16px; height:38px; font-size: 0.85rem; border-radius: 10px;">← Home</button>
+                <div style="opacity: 0.5; font-size: 0.7rem; font-weight: 800; letter-spacing: 1px;">QUICKCOPY PRO</div>
+            </div>
+            <h2 style="font-weight:900; font-size: 1.5rem; margin-top: 4px;">Platform Capabilities</h2>
         </div>
 
         <div class="glass-card" style="line-height: 1.6;">
-            <h1 style="font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; margin-bottom: 20px; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Built for Power Users.</h1>
-            <p style="font-size: 1.1rem; margin-bottom: 32px; color: var(--text-dim);">QuickCopy Pro is more than a clipboard—it's a high-performance ecosystem designed to organize your digital life.</p>
+            <h1 style="font-size: clamp(2.2rem, 5vw, 3.2rem); font-weight: 900; margin-bottom: 20px; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Performance Engineering.</h1>
+            <p style="font-size: 1.15rem; margin-bottom: 40px; color: var(--text-dim); max-width: 700px;">QuickCopy Pro isn't just a clipboard—it's a high-performance workspace designed to capture and organize your digital flow.</p>
 
-            <div class="grid-layout-2" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+            <div class="grid-layout-2" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
                 <!-- Feature 1 -->
-                <div class="glass-card" style="padding: 20px; border-radius: 16px;">
-                    <div class="feat-title">☁️ Real-Time Cloud Sync</div>
-                    <div class="feat-desc">Every clip you save is instantly pushed to the cloud and synced across all your devices.</div>
+                <div class="glass-card" style="padding: 24px; border-radius: 20px;">
+                    <div style="font-size: 1.5rem; margin-bottom: 12px;">☁️</div>
+                    <div class="feat-title" style="font-weight: 800; font-size: 1.1rem; margin-bottom: 8px;">Real-Time Cloud Sync</div>
+                    <div class="feat-desc" style="font-size: 0.9rem; color: var(--text-dim);">Built on Firebase's global backbone. Every character you type is instantly pushed to all your authorized devices.</div>
                 </div>
                 <!-- Feature 2 -->
-                <div class="glass-card" style="padding: 20px; border-radius: 16px;">
-                    <div class="feat-title">🏷️ Smart Auto-Tagging</div>
-                    <div class="feat-desc">Advanced regex detection automatically categorizes your clips into #Link or #Code snippets.</div>
+                <div class="glass-card" style="padding: 24px; border-radius: 20px;">
+                    <div style="font-size: 1.5rem; margin-bottom: 12px;">🏷️</div>
+                    <div class="feat-title" style="font-weight: 800; font-size: 1.1rem; margin-bottom: 8px;">Regex Auto-Tagging</div>
+                    <div class="feat-desc" style="font-size: 0.9rem; color: var(--text-dim);">Intelligent detection engine that automatically categorizes #Link and #Code snippets the moment they are saved.</div>
                 </div>
                 <!-- Feature 3 -->
-                <div class="glass-card" style="padding: 20px; border-radius: 16px;">
-                    <div class="feat-title">🔗 Rich Link Previews</div>
-                    <div class="feat-desc">URLs aren't just text. We fetch favicons and render beautiful cards for every link you save.</div>
+                <div style="background: var(--primary-glow); border: 1px solid var(--primary); padding: 24px; border-radius: 20px;">
+                    <div style="font-size: 1.5rem; margin-bottom: 12px;">⌨️</div>
+                    <div class="feat-title" style="font-weight: 800; font-size: 1.1rem; margin-bottom: 8px; color: white;">Vim-Style Power</div>
+                    <div class="feat-desc" style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">Total keyboard mastery. Use <code style="background:rgba(0,0,0,0.2);padding:2px 4px;border-radius:4px;">j/k</code> to navigate, <code style="background:rgba(0,0,0,0.2);padding:2px 4px;border-radius:4px;">y</code> to copy, and <code style="background:rgba(0,0,0,0.2);padding:2px 4px;border-radius:4px;">/</code> to search.</div>
                 </div>
                 <!-- Feature 4 -->
-                <div class="glass-card" style="padding: 20px; border-radius: 16px;">
-                    <div class="feat-title">✍️ Native Markdown</div>
-                    <div class="feat-desc">Render complex notes and code blocks with full Markdown support and E2E security.</div>
+                <div class="glass-card" style="padding: 24px; border-radius: 20px;">
+                    <div style="font-size: 1.5rem; margin-bottom: 12px;">✍️</div>
+                    <div class="feat-title" style="font-weight: 800; font-size: 1.1rem; margin-bottom: 8px;">Native Markdown</div>
+                    <div class="feat-desc" style="font-size: 0.9rem; color: var(--text-dim);">Beautifully rendered technical notes and code blocks with syntax highlighting and sanitization.</div>
                 </div>
                 <!-- Feature 5 -->
-                <div class="glass-card" style="padding: 20px; border-radius: 16px;">
-                    <div class="feat-title">⌨️ Vim-Style Navigation</div>
-                    <div class="feat-desc">Total keyboard control. Use j/k to move, y to copy, and / to search instantly.</div>
+                <div class="glass-card" style="padding: 24px; border-radius: 20px;">
+                    <div style="font-size: 1.5rem; margin-bottom: 12px;">📊</div>
+                    <div class="feat-title" style="font-weight: 800; font-size: 1.1rem; margin-bottom: 8px;">Deep Analytics</div>
+                    <div class="feat-desc" style="font-size: 0.9rem; color: var(--text-dim);">Track your productivity with visual statistics on clip volume, storage health, and usage patterns.</div>
                 </div>
                 <!-- Feature 6 -->
-                <div class="glass-card" style="padding: 20px; border-radius: 16px;">
-                    <div class="feat-title">🔍 Search Highlighting</div>
-                    <div class="feat-desc">Instantly find what you need with real-time visual highlighting of matching terms.</div>
+                <div class="glass-card" style="padding: 24px; border-radius: 20px;">
+                    <div style="font-size: 1.5rem; margin-bottom: 12px;">🛡️</div>
+                    <div class="feat-title" style="font-weight: 800; font-size: 1.1rem; margin-bottom: 8px;">E2E Security</div>
+                    <div class="feat-desc" style="font-size: 0.9rem; color: var(--text-dim);">Zero-knowledge architecture. Your data is isolated and encrypted, accessible only via secure authentication.</div>
                 </div>
             </div>
 
-            <p style="text-align: center; margin-top: 40px; font-weight: 700;">More professional tools coming in every update.</p>
+            <p style="text-align: center; margin-top: 60px; font-weight: 800; font-size: 1.2rem; opacity: 0.8;">The roadmap to 3.0 is already in motion. 🚀</p>
         </div>
 
         <footer class="app-footer">

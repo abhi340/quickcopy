@@ -15,5 +15,6 @@ export const ICONS = {
   archive: `<svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M21 8v13H3V8M1 3h22v5H1V3zm10 8h2"></path></svg>`,
   restore: `<svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>`,
   share: `<svg viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"></path></svg>`,
-  markdown: `<svg viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2"><path d="M9 5v14M15 5v14M9 5l3 5 3-5M3 5h18M3 19h18"></path></svg>`
+  markdown: `<svg viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2"><path d="M9 5v14M15 5v14M9 5l3 5 3-5M3 5h18M3 19h18"></path></svg>`,
+  feedback: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>`
 };

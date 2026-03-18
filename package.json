@@ -1,0 +1,8 @@
+{
+  "name": "quickcopy-tests",
+  "version": "2.5.7",
+  "type": "module",
+  "scripts": {
+    "test": "node tests/unit.test.js"
+  }
+}

@@ -1,7 +1,7 @@
 import { auth, db, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail, deleteUser, collection, addDoc, getDocs, query, where, updateDoc, deleteDoc, doc } from './firebase.js';
 import { ICONS } from './icons.js';
 import { palettes, applyPalette, toggleTheme } from './theme.js';
-import { showToast, escapeHtml, showError, getFriendlyAuthError, getSnippetType } from './utils.js';
+import { showToast, escapeHtml, showError, getFriendlyAuthError, getSnippetType, showJokeModal } from './utils.js';
 
 // Initialization Check
 console.log("🚀 QuickCopy Pro Initializing...");
@@ -17,12 +17,32 @@ let searchTerm = '';
 let currentView = 'active'; // active, archived, trash
 let currentTag = 'all'; // all, #Link, #Code
 let selectedIdx = -1; // Vim-style navigation
-let currentActivePage = ''; // dashboard, login, loading
+let currentActivePage = ''; // dashboard, login, loading, signup, reset
 
 function highlightSearch(text, term) {
   if (!term || term.length < 2) return text;
   const regex = new RegExp(`(${term})`, 'gi');
   return text.replace(regex, '<span class="search-highlight">$1</span>');
+}
+
+// ===== UTILS & VALIDATION =====
+function isValidEmail(email) {
+  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
+}
+
+function setLoading(btnId, isLoading, originalText) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  if (isLoading) {
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner" style="width:16px; height:16px; border-width:2px; margin-right:8px; display:inline-block; vertical-align:middle;"></span> Processing...`;
+    btn.style.opacity = '0.7';
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = originalText;
+    btn.style.opacity = '1';
+  }
 }
 
 // Load Marked.js & DOMPurify
@@ -48,9 +68,46 @@ function clearApp() {
   if (app) app.innerHTML = '';
 }
 
+// ===== HUMOROUS ERROR HANDLER =====
+function getHumorousError(code) {
+  const authJokes = [
+    "Wait, who are you again? 🕵️‍♂️",
+    "Wrong password. Even my cat knows it. 🐱",
+    "Invalid credentials. Did you forget you exist? 👻",
+    "Nope. Try a password that actually works this time. 🙊",
+    "Access denied. Maybe try '123456'? (Just kidding, don't). 🙅‍♂️",
+    "Your email and password are having an argument. They don't match. 😤"
+  ];
+  const serverJokes = [
+    "Our server is taking a nap. Try again in a bit. 😴",
+    "Something went wrong. A squirrel probably chewed the wire. 🐿️",
+    "500 Error: The server is currently reconsidering its life choices. 🤔",
+    "Cloud failure. It's raining bugs today. 🌧️",
+    "Server timed out. It went to get a coffee. ☕"
+  ];
+
+  if (code.includes('user-not-found') || code.includes('wrong-password') || code.includes('invalid-credential')) {
+    return authJokes[Math.floor(Math.random() * authJokes.length)];
+  }
+  if (code.includes('network-request-failed') || code.includes('internal-error')) {
+    return serverJokes[Math.floor(Math.random() * serverJokes.length)];
+  }
+  return code.replace('auth/', '').replace(/-/g, ' '); 
+}
+
+// Global Auth Event Delegate (Handles navigation robustly)
+document.addEventListener('click', (e) => {
+  const target = e.target.closest('button, .btn-link');
+  if (!target) return;
+  
+  if (target.id === 'show-signup-btn') { e.preventDefault(); renderSignup(); }
+  if (target.id === 'forgot-password-btn') { e.preventDefault(); showForgotPasswordModal(); }
+  if (target.id === 'back-to-login' || target.id === 'back-to-login-signup') { e.preventDefault(); renderLogin(true); }
+});
+
 // ===== AUTH RENDERERS =====
-function renderLogin() {
-  if (currentActivePage === 'login') return;
+function renderLogin(force = false) {
+  if (!force && currentActivePage === 'login') return;
   currentActivePage = 'login';
   console.log("🔑 Rendering Login Screen...");
   
@@ -59,7 +116,7 @@ function renderLogin() {
   if (!appEl) return;
   
   appEl.innerHTML = `
-    <div class="landing-layout">
+    <div class="landing-layout" style="animation: fadeIn 0.3s ease-out;">
       <div class="landing-hero">
         <h1>Your Digital<br>Second Brain.</h1>
         <p>Sync your clipboard, code snippets, and links across all devices instantly. Built with End-to-End security and a stunning Glassmorphism UI.</p>
@@ -94,14 +151,16 @@ function renderLogin() {
             <input type="email" id="login-email" placeholder="Email" autocomplete="email" />
             <input type="password" id="login-password" placeholder="Password" autocomplete="current-password" />
             <button class="btn btn-primary" id="login-btn">Sign In</button>
-            <button class="btn btn-outline" id="forgot-password-btn" style="margin-top: 8px;">Forgot Password?</button>
+            <div style="margin: 10px 0;">
+              <button class="btn-link" id="forgot-password-btn">Forgot Password?</button>
+            </div>
             <button class="btn btn-outline" id="show-signup-btn">Create New Account</button>
             
             <div class="google-btn btn" id="google-signin-btn">
               <span class="nav-icon">${ICONS.google}</span>
               <span>Continue with Google</span>
             </div>
-            <div id="login-error" class="error" style="display:none;"></div>
+            <div id="login-error" class="auth-error-msg" style="display:none;"></div>
           </div>
         </div>
       </div>
@@ -112,51 +171,66 @@ function renderLogin() {
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     if (!email || !password) return showError('Fields required.', 'login-error');
+    if (!isValidEmail(email)) return showError('Invalid email format.', 'login-error');
+
+    setLoading('login-btn', true, 'Sign In');
     try { await signInWithEmailAndPassword(auth, email, password); } 
-    catch (err) { showError(getFriendlyAuthError(err.code), 'login-error'); }
+    catch (err) { showError(getHumorousError(err.code), 'login-error'); }
+    finally { setLoading('login-btn', false, 'Sign In'); }
   };
 
-  document.getElementById('forgot-password-btn').onclick = showForgotPasswordModal;
-  document.getElementById('show-signup-btn').onclick = renderSignup;
   document.getElementById('google-signin-btn').onclick = async () => {
+    const original = document.getElementById('google-signin-btn').innerHTML;
+    setLoading('google-signin-btn', true, original);
     try { 
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider); 
     } catch (err) { 
-      if (err.code === 'auth/unauthorized-domain') {
-        alert("🔒 UNAUTHORIZED DOMAIN: Please add " + window.location.hostname + " to your Firebase Authorized Domains list.");
-      }
-      showError(getFriendlyAuthError(err.code), 'login-error'); 
+      showError(getHumorousError(err.code), 'login-error'); 
+    } finally {
+      setLoading('google-signin-btn', false, original);
     }
   };
 }
 
 function showForgotPasswordModal() {
+  currentActivePage = 'reset';
   clearApp();
   document.getElementById('app').innerHTML = `
-    <div class="auth-container" style="margin-top: 100px;">
+    <div class="auth-container" style="margin: 100px auto; max-width: 400px; animation: fadeIn 0.3s ease-out;">
       <h1>Reset</h1>
       <p class="auth-subtitle">Enter email for reset link.</p>
       <div class="glass-card">
         <input type="email" id="reset-email" placeholder="Email" />
         <button class="btn btn-primary" id="send-reset">Send Reset Link</button>
-        <button class="btn btn-outline" id="back-to-login">← Back to Sign In</button>
-        <div id="reset-error" class="error" style="display:none;"></div>
+        <div style="margin-top: 10px;">
+          <button class="btn-link" id="back-to-login">← Back to Sign In</button>
+        </div>
+        <div id="reset-error" class="auth-error-msg" style="display:none;"></div>
       </div>
     </div>
   `;
   document.getElementById('send-reset').onclick = async () => {
     const email = document.getElementById('reset-email').value.trim();
-    try { await sendPasswordResetEmail(auth, email); showToast('Email sent! 📧'); currentActivePage = ''; renderLogin(); } 
-    catch (err) { showError(getFriendlyAuthError(err.code), 'reset-error'); }
+    if (!isValidEmail(email)) return showError('Invalid email format.', 'reset-error');
+    setLoading('send-reset', true, 'Send Reset Link');
+    try { 
+      await sendPasswordResetEmail(auth, email); 
+      showToast('Email sent! 📧'); 
+      renderLogin(true); 
+    } catch (err) { 
+      showError(getHumorousError(err.code), 'reset-error'); 
+    } finally {
+      setLoading('send-reset', false, 'Send Reset Link');
+    }
   };
-  document.getElementById('back-to-login').onclick = () => { currentActivePage = ''; renderLogin(); };
 }
 
 function renderSignup() {
+  currentActivePage = 'signup';
   clearApp();
   document.getElementById('app').innerHTML = `
-    <div class="auth-container" style="margin-top: 100px;">
+    <div class="auth-container" style="margin: 60px auto; max-width: 400px; animation: fadeIn 0.3s ease-out;">
       <h1>Join Us</h1>
       <p class="auth-subtitle">Start syncing in seconds.</p>
       <div class="glass-card">
@@ -165,8 +239,10 @@ function renderSignup() {
         <input type="password" id="signup-password" placeholder="Password (8+ chars)" />
         <input type="password" id="signup-confirm" placeholder="Confirm Password" />
         <button class="btn btn-primary" id="signup-btn">Create Account</button>
-        <button class="btn btn-outline" id="back-to-login-signup">Already have an account?</button>
-        <div id="signup-error" class="error" style="display:none;"></div>
+        <div style="margin-top: 10px;">
+          <button class="btn-link" id="back-to-login-signup">Already have an account?</button>
+        </div>
+        <div id="signup-error" class="auth-error-msg" style="display:none;"></div>
       </div>
     </div>
   `;
@@ -174,13 +250,21 @@ function renderSignup() {
     const name = document.getElementById('signup-name').value.trim();
     const email = document.getElementById('signup-email').value.trim();
     const password = document.getElementById('signup-password').value;
+    if (!name || !email || !password) return showError('All fields are required.', 'signup-error');
+    if (!isValidEmail(email)) return showError('Invalid email format.', 'signup-error');
+    if (password.length < 8) return showError('Password min 8 chars.', 'signup-error');
     if (password !== document.getElementById('signup-confirm').value) return showError('Passwords mismatch.', 'signup-error');
+    
+    setLoading('signup-btn', true, 'Create Account');
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       await addDoc(collection(db, 'users'), { uid: cred.user.uid, name, email, createdAt: new Date().toISOString() });
-    } catch (err) { showError(getFriendlyAuthError(err.code), 'signup-error'); }
+    } catch (err) { 
+      showError(getHumorousError(err.code), 'signup-error'); 
+    } finally {
+      setLoading('signup-btn', false, 'Create Account');
+    }
   };
-  document.getElementById('back-to-login-signup').onclick = () => { currentActivePage = ''; renderLogin(); };
 }
 
 // ===== MAIN APP RENDERER =====
@@ -195,7 +279,7 @@ function renderApp() {
   const safeSearchTerm = escapeHtml(searchTerm);
 
   document.getElementById('app').innerHTML = `
-    <div class="header">
+    <div class="header" style="animation: fadeIn 0.3s ease-out;">
       <div class="user-greeting">Hello, <span id="header-user-name">${safeDisplayName}</span></div>
       <div class="header-search-container">
         ${ICONS.search}
@@ -220,17 +304,22 @@ function renderApp() {
       </div>
     </div>
 
-    <div class="glass-card main-input-card">
+    <div class="glass-card toolbar-row">
+      <div class="toolbar-tabs">
+        <button class="btn btn-outline ${currentView === 'active' ? 'active' : ''}" id="view-active">Active</button>
+        <button class="btn btn-outline ${currentView === 'archived' ? 'active' : ''}" id="view-archived">Archived</button>
+        <button class="btn btn-outline ${currentView === 'trash' ? 'active' : ''}" id="view-trash">Trash</button>
+      </div>
+
       <div id="input-area">
-        <input type="text" id="new-snippet" placeholder="Paste link or text..." autocomplete="off"/>
+        <div style="flex: 1; position: relative;">
+          <textarea id="new-snippet" placeholder="Paste link or text..." autocomplete="off"></textarea>
+          <div class="input-hint" style="position: absolute; right: 15px; top: 14px; pointer-events: none; font-size: 0.7rem; color: var(--text-dim); opacity: 0.6;">
+            Shift+Enter ↵
+          </div>
+        </div>
         <button id="add-btn" class="btn btn-primary">Add Clip</button>
       </div>
-    </div>
-
-    <div style="display: flex; gap: 12px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 8px;">
-      <button class="btn btn-outline ${currentView === 'active' ? 'active' : ''}" id="view-active" style="padding: 8px 16px; font-size: 0.85rem; width: auto;">Active</button>
-      <button class="btn btn-outline ${currentView === 'archived' ? 'active' : ''}" id="view-archived" style="padding: 8px 16px; font-size: 0.85rem; width: auto;">Archived</button>
-      <button class="btn btn-outline ${currentView === 'trash' ? 'active' : ''}" id="view-trash" style="padding: 8px 16px; font-size: 0.85rem; width: auto;">Trash</button>
     </div>
 
     <div id="tag-filters-container" style="display: flex; gap: 8px; margin-bottom: 24px; overflow-x: auto;"></div>
@@ -238,6 +327,16 @@ function renderApp() {
     <div id="snippets-list-container"></div>
 
     <footer class="app-footer">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 24px; margin-bottom: 32px;">
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: center;">
+          <button id="generate-joke-btn" class="btn btn-primary" style="box-shadow: none; height: 40px; padding: 0 16px; font-size: 0.85rem; background: #f59e0b;">
+            <span style="font-size: 1.1rem; margin-right: 8px;">🎁</span> Donate
+          </button>
+          <a href="mailto:abhicm019@gmail.com?subject=QuickCopy Pro Feedback" class="btn btn-outline" style="height: 40px; padding: 0 16px; font-size: 0.85rem; border-color: var(--glass-border); background: var(--glass);">
+            <span class="nav-icon" style="width: 16px; height: 16px; display: inline-flex;">${ICONS.feedback}</span> Send Feedback
+          </a>
+        </div>
+      </div>
       <div class="footer-links">
         <a href="about.html">About</a>
         <a href="features.html">Features</a>
@@ -254,46 +353,70 @@ function renderApp() {
   const dropdown = document.getElementById('dropdown-menu');
   const searchInput = document.getElementById('search-input');
 
-  profileBtn.onclick = (e) => { 
-    e.stopPropagation(); 
-    dropdown.classList.toggle('show'); 
-  };
+  if (profileBtn) {
+    profileBtn.onclick = (e) => { 
+      e.stopPropagation(); 
+      dropdown.classList.toggle('show'); 
+    };
+  }
   
   document.addEventListener('click', (e) => {
-    if (!e.target.closest('.profile-dropdown-container')) {
+    if (!e.target.closest('.profile-dropdown-container') && dropdown) {
       dropdown.classList.remove('show');
     }
   });
 
-  document.getElementById('view-active').onclick = () => { currentView = 'active'; renderSnippets(); };
-  document.getElementById('view-archived').onclick = () => { currentView = 'archived'; renderSnippets(); };
-  document.getElementById('view-trash').onclick = () => { currentView = 'trash'; renderSnippets(); };
+  const vA = document.getElementById('view-active');
+  const vAr = document.getElementById('view-archived');
+  const vT = document.getElementById('view-trash');
+  if (vA) vA.onclick = () => { currentView = 'active'; renderSnippets(); };
+  if (vAr) vAr.onclick = () => { currentView = 'archived'; renderSnippets(); };
+  if (vT) vT.onclick = () => { currentView = 'trash'; renderSnippets(); };
 
-  document.getElementById('settings-btn').onclick = (e) => {
-    e.stopPropagation();
-    window.location.href = 'settings.html';
-  };
+  const sBtn = document.getElementById('settings-btn');
+  if (sBtn) sBtn.onclick = (e) => { e.stopPropagation(); window.location.href = 'settings.html'; };
 
-  document.getElementById('toggle-theme-btn').onclick = (e) => {
-    e.stopPropagation();
-    toggleTheme();
-    currentActivePage = ''; // Force re-render for text update
-    renderApp(); 
-  };
+  const tBtn = document.getElementById('toggle-theme-btn');
+  if (tBtn) tBtn.onclick = (e) => { e.stopPropagation(); toggleTheme(); currentActivePage = ''; renderApp(); };
 
-  document.getElementById('sign-out-btn').onclick = () => {
-    currentActivePage = '';
-    signOut(auth);
-  };
+  const soBtn = document.getElementById('sign-out-btn');
+  if (soBtn) soBtn.onclick = () => { currentActivePage = ''; signOut(auth); };
   
-  document.getElementById('delete-account-btn').onclick = confirmDeleteAccount;
-  document.getElementById('add-btn').onclick = addSnippet;
-  document.getElementById('new-snippet').onkeypress = (e) => { if (e.key === 'Enter') addSnippet(); };
+  const delBtn = document.getElementById('delete-account-btn');
+  if (delBtn) delBtn.onclick = confirmDeleteAccount;
 
-  searchInput.oninput = (e) => {
-    searchTerm = e.target.value;
-    renderSnippets();
-  };
+  const addBtn = document.getElementById('add-btn');
+  if (addBtn) addBtn.onclick = addSnippet;
+
+  const jokeBtn = document.getElementById('generate-joke-btn');
+  if (jokeBtn) jokeBtn.onclick = showJokeModal;
+
+    const nSnip = document.getElementById('new-snippet');
+    const inputHint = document.querySelector('.input-hint');
+    if (nSnip) {
+      nSnip.oninput = () => {
+        if (inputHint) inputHint.style.display = nSnip.value.length > 0 ? 'none' : 'block';
+        
+        // Use 'auto' to get the true content height for shrinking
+        nSnip.style.height = 'auto';
+        const newHeight = nSnip.scrollHeight;
+        // Clamp between 52px and 400px
+        nSnip.style.height = Math.max(52, newHeight) + 'px';
+        
+        nSnip.style.overflowY = newHeight >= 400 ? 'auto' : 'hidden';
+      };
+      nSnip.onkeydown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          addSnippet();
+          nSnip.style.height = '52px';
+          nSnip.style.overflowY = 'hidden';
+          if (inputHint) inputHint.style.display = 'block';
+        }
+      };
+    }
+
+  if (searchInput) searchInput.oninput = (e) => { searchTerm = e.target.value; renderSnippets(); };
 
   renderSnippets();
 }
@@ -382,14 +505,16 @@ function renderSnippets() {
             if (isMarkdown && window.marked && window.DOMPurify) {
               try {
                 const rawHtml = marked.parse(item.text);
-                contentHtml = DOMPurify.sanitize(rawHtml);
+                contentHtml = `<div class="markdown-body">${DOMPurify.sanitize(rawHtml)}</div>`;
                 if (searchTerm && searchTerm.length >= 2) contentHtml = highlightSearch(contentHtml, searchTerm);
               } catch (e) {}
+            } else if (type === 'code') {
+              contentHtml = `<div class="code-block">${contentHtml}</div>`;
             }
 
             return `
               <div class="snippet-card ${item.pinned ? 'pinned' : ''} ${selectedIdx === i ? 'selected' : ''}" data-index="${i}">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div class="snippet-header">
                   <div style="display: flex; gap: 4px; flex-wrap: wrap;">
                     <span class="badge badge-${type}">${type}</span>
                     ${(item.tags || []).map(t => `<span class="badge ${t === '#Link' ? 'badge-link' : (t === '#Code' ? 'badge-code' : 'badge-text')}" style="opacity: 0.8;">${t}</span>`).join('')}
@@ -420,7 +545,6 @@ function renderSnippets() {
     </div>
   `;
 
-  // Attach card events
   document.querySelectorAll('.snippet-card').forEach(card => {
     card.onclick = (e) => {
       if (e.target.closest('.icon-btn')) return;

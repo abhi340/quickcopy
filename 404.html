@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404: Lost in the Cloud | QuickCopy Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔦</text></svg>">
+</head>
+<body>
+    <div id="app" style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+        <div class="glass-card" style="text-align: center; max-width: 500px; padding: 60px 40px; animation: fadeIn 0.5s ease-out;">
+            <div style="font-size: 5rem; margin-bottom: 20px;">🕵️‍♂️</div>
+            <h1 style="font-size: 3rem; font-weight: 900; margin-bottom: 10px; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">404</h1>
+            <h2 style="font-weight: 800; margin-bottom: 20px;">Whoops! You're Off-Grid.</h2>
+            
+            <p style="color: var(--text-dim); line-height: 1.6; margin-bottom: 32px; font-style: italic;">
+                "Even our smart auto-tagging couldn't find this page. It's probably having coffee with a 500 error somewhere in the cloud."
+            </p>
+
+            <div style="background: rgba(0,0,0,0.05); padding: 20px; border-radius: 16px; border: 1px solid var(--glass-border); margin-bottom: 32px;">
+                <p style="font-size: 0.85rem; font-weight: 600; color: var(--text);">Possible Reasons:</p>
+                <ul style="list-style: none; font-size: 0.8rem; color: var(--text-dim); margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+                    <li>• The link is broken (unlike our E2E encryption).</li>
+                    <li>• You typed something crazy in the URL bar.</li>
+                    <li>• The page has been archived... permanently.</li>
+                </ul>
+            </div>
+
+            <button class="btn btn-primary" onclick="window.location.href='index.html'" style="width: 100%; height: 52px; font-size: 1rem;">
+                Back to Dashboard
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initTheme } from './src/theme.js';
+        initTheme();
+    </script>
+</body>
+</html>

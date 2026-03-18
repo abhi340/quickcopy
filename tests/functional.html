@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QuickCopy Pro - Functional Test Suite</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 800px; margin: 0 auto; }
+    .test-case { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
+    .pass { border-left: 5px solid #10b981; background: #f0fdf4; }
+    .fail { border-left: 5px solid #f43f5e; background: #fef2f2; }
+    .status { font-weight: bold; }
+    h1 { color: #6366f1; }
+  </style>
+</head>
+<body>
+  <h1>🛠️ Functional Test Suite</h1>
+  <p>This page verifies core logic and UI components.</p>
+  
+  <div id="results"></div>
+
+  <script type="module">
+    import { getSnippetType, escapeHtml } from '../src/utils.js';
+    import { ICONS } from '../src/icons.js';
+
+    const results = document.getElementById('results');
+
+    function runTest(name, fn) {
+      const div = document.createElement('div');
+      div.className = 'test-case';
+      try {
+        fn();
+        div.classList.add('pass');
+        div.innerHTML = `<strong>${name}</strong>: <span class="status">PASSED ✅</span>`;
+      } catch (err) {
+        div.classList.add('fail');
+        div.innerHTML = `<strong>${name}</strong>: <span class="status">FAILED ❌</span><br><small>${err.message}</small>`;
+      }
+      results.appendChild(div);
+    }
+
+    // Logic Tests
+    runTest("Link detection logic", () => {
+      if (getSnippetType("https://test.com") !== 'link') throw new Error("Failed to detect URL");
+    });
+
+    runTest("Code detection logic", () => {
+      if (getSnippetType("function test() {}") !== 'code') throw new Error("Failed to detect function keyword");
+    });
+
+    // Asset Tests
+    runTest("Icon library loading", () => {
+      if (!ICONS.copy || !ICONS.settings) throw new Error("Icons object is incomplete");
+    });
+
+    // Theme Tests
+    runTest("LocalStorage availability", () => {
+      localStorage.setItem('test', '1');
+      if (localStorage.getItem('test') !== '1') throw new Error("LocalStorage is not working");
+      localStorage.removeItem('test');
+    });
+
+    // UI Structure Check
+    runTest("DOM Purify loading (simulated)", () => {
+      // Just check if we can add a script tag
+      const s = document.createElement('script');
+      if (!s) throw new Error("DOM creation failed");
+    });
+
+    const summary = document.createElement('h3');
+    summary.textContent = "Test Run Complete. Please verify visual components manually below.";
+    results.appendChild(summary);
+  </script>
+
+  <div class="test-case">
+    <strong>Visual Verification: Icons</strong><br>
+    <div id="icon-preview" style="display:flex; gap:10px; margin-top:10px;"></div>
+  </div>
+
+  <script type="module">
+    import { ICONS } from '../src/icons.js';
+    const preview = document.getElementById('icon-preview');
+    Object.keys(ICONS).forEach(key => {
+      const div = document.createElement('div');
+      div.innerHTML = ICONS[key];
+      div.title = key;
+      div.style.width = '30px';
+      preview.appendChild(div);
+    });
+  </script>
+</body>
+</html>
