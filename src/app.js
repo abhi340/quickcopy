@@ -637,7 +637,7 @@ document.addEventListener('keydown', (e) => {
   if ((e.ctrlKey && e.key === 'f') || e.key === '/') {
     if (document.activeElement.tagName !== 'INPUT') { e.preventDefault(); document.getElementById('search-input')?.focus(); }
   }
-  if (document.activeElement.tagName !== 'INPUT') {
+  if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
     if (e.key === 'j') { e.preventDefault(); selectedIdx = Math.min(selectedIdx + 1, filteredSnippets.length - 1); renderSnippets(); document.querySelector(`[data-index="${selectedIdx}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
     if (e.key === 'k') { e.preventDefault(); selectedIdx = Math.max(selectedIdx - 1, 0); renderSnippets(); document.querySelector(`[data-index="${selectedIdx}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
     if (e.key === 'y' && selectedIdx !== -1) { navigator.clipboard.writeText(filteredSnippets[selectedIdx].text); showToast('Copied! 📋'); }
