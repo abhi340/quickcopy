@@ -1,8 +1,9 @@
 # 🚀 QuickCopy Pro — The Premium Cloud Clipboard ☁️
 
-[![GitHub version](https://img.shields.io/badge/version-2.1.0-blue.svg)](changelog.html)
+[![GitHub version](https://img.shields.io/badge/version-2.5.8-blue.svg)](changelog.html)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/abhi340/quickcopy/graphs/commit-activity)
+[![Powered by Cloudflare](https://img.shields.io/badge/Powered%20By-Cloudflare%20Pages-orange.svg)](https://pages.cloudflare.com/)
 
 > <strong>“One-click copy. Zero drag. Pure Productivity.”</strong>
 
@@ -19,72 +20,61 @@ QuickCopy isn't just a list of texts; it's a <strong>professional-grade digital 
 - <strong>🧱 Masonry Layout:</strong> A beautiful Pinterest-style flow that optimizes vertical space (3 columns on PC, 1 on Mobile).
 - <strong>🔗 Public Sharing:</strong> Generate unique, view-only links for any snippet to share with colleagues or friends.
 - <strong>✍️ Markdown Rendering:</strong> Toggle <strong>M↓</strong> to render beautiful formatted notes, lists, and code blocks.
-- <strong>📦 Advanced Management:</strong> Keep your workspace clean with dedicated <strong>Archive</strong> and <strong>Trash</strong> folders.
+- <strong>📊 Productivity Analytics:</strong> Visual stats on your clip usage and storage health.
 - <strong>⚡ Power-User Shortcuts:</strong>
   - `Ctrl + Enter`: Instant Save
-  - `Ctrl + F`: Global Search
-  - `Alt + 1-9`: Instant Copy top clips
+  - `j / k`: Vim-style navigation
+  - `y`: Instant Copy selected clip
+  - `/`: Focus Search
   - `Esc`: Clear search/modals
 
-### 🔐 Security & Privacy
-- <strong>End-to-End Hardening:</strong> Patched against XSS and attribute injection.
-- <strong>DOMPurify Integration:</strong> Every markdown snippet is sanitized before rendering.
-- <strong>Zero-Trust Architecture:</strong> Forced re-login on refresh and restricted Firestore rules.
+---
+
+## 🛠️ The "Human-AI" Development Story
+
+QuickCopy Pro is a testament to the power of <strong>human-driven AI pair programming</strong>. This project was built through an intensive, high-velocity collaboration between **Abhiram (Lead Developer)** and **Gemini (AI Engineer)**.
+
+### How we built this:
+1.  **Ideation & Architecture:** Abhiram defined the vision for a "Digital Second Brain," while Gemini architected the robust Design System v5.0.
+2.  **Iterative Refinement:** Every UI pixel—from the multi-line dynamic input box to the grid-based mobile header—was refined through dozens of real-time feedback loops.
+3.  **Deployment:** Leveraging **Cloudflare Pages** for lightning-fast global edge hosting and **Firebase** for low-latency real-time synchronization.
+4.  **Security First:** We jointly implemented strict Regex validations, Zero-Trust authentication flows, and E2E hardening.
+
+---
+
+## 🚀 Deployment & Tech Stack
+
+### Infrastructure
+- **Hosting:** [Cloudflare Pages](https://pages.cloudflare.com/) — Global CDN delivery with automatic CI/CD.
+- **Database:** [Firebase Firestore](https://firebase.google.com/) — Real-time NoSQL data synchronization.
+- **Auth:** [Firebase Authentication](https://firebase.google.com/) — Secure Google and Email/Password flows.
+
+### Core Tech
+- **Frontend:** Vanilla JavaScript (ES Modules), HTML5, CSS3 (Glassmorphism).
+- **Security:** [DOMPurify](https://github.com/cure53/dompurify) for sanitization.
+- **Rendering:** [Marked.js](https://marked.js.org/) for high-speed Markdown parsing.
 
 ---
 
 ## 🚀 Getting Started
 
-### 🛠️ Prerequisites
-- A modern web browser (Chrome, Edge, or Safari recommended for PWA).
-- A [Firebase Project](https://console.firebase.google.com/).
-
-### 📦 Installation
-1.  <strong>Clone the repository:</strong>
-    ```bash
-    git clone https://github.com/abhi340/quickcopy.git
-    cd quickcopy
-    ```
-
-2.  <strong>Configure Firebase:</strong>
-    - Copy `firebase-config.example.js` to `firebase-config.js`.
-    - Fill in your actual credentials from the Firebase Console.
-    ```javascript
-    // firebase-config.js
-    export const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      // ... rest of your config
-    };
-    ```
-
-3.  <strong>Launch the app:</strong>
-    Simply open `index.html` in your browser or use a local server like <strong>Live Server</strong> in VS Code.
+1.  **Clone:** `git clone https://github.com/abhi340/quickcopy.git`
+2.  **Configure:** Copy `firebase-config.example.js` to `firebase-config.js` and add your keys.
+3.  **Deploy:** Connect your repository to **Cloudflare Pages** for instant deployment.
 
 ---
 
-## 🛠️ Tech Stack
-- <strong>Frontend:</strong> Vanilla JavaScript (ES Modules), HTML5, CSS3.
-- <strong>Libraries:</strong> [Marked.js](https://marked.js.org/) (Markdown), [DOMPurify](https://github.com/cure53/dompurify) (Sanitization).
-- <strong>Backend:</strong> Firebase Auth & Firestore Real-time Database.
-- <strong>PWA:</strong> Service Workers & Manifest.json.
+## 🙌 Support the Vision
+If QuickCopy Pro has helped your workflow, consider supporting the journey!
+- **International:** [Buy Me a Coffee](https://www.buymeacoffee.com/abhiram)
+- **India:** Pay via UPI (**abhiramkodicherla-1@oksbi**)
 
 ---
 
-## 🤝 Collaboration & Contribution
-QuickCopy Pro is a testament to the power of <strong>Human-AI Pair Programming</strong>, co-developed by <strong>[Abhi](https://github.com/abhi340)</strong> and <strong>Gemini (AI Pair Programmer)</strong>.
-
-- <strong>Security issues?</strong> See [docs/SECURITY.md](docs/SECURITY.md).
-- <strong>Interested in our process?</strong> Read the [docs/COLLABORATION.md](docs/COLLABORATION.md).
-- <strong>What's coming next?</strong> Check the [docs/TODO.md](docs/TODO.md).
+## 🤝 Credits
+- **Lead Developer:** [Abhiram](https://github.com/abhi340)
+- **AI Engineer:** Gemini AI (Google)
 
 ---
 
-## 🙌 Credits
-- <strong>Lead Developer:</strong> [Abhi](https://github.com/abhi340)
-- <strong>AI Engineer:</strong> Gemini AI
-
----
-
-👉 <strong>[Launch QuickCopy Pro Live](https://abhi340.github.io/quickcopy/)</strong>
+👉 **[Launch QuickCopy Pro Live](https://quickcopy.pages.dev/)**
