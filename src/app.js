@@ -729,7 +729,7 @@ onAuthStateChanged(auth, async (u) => {
           localId: u.uid,
           refreshToken: u.refreshToken
         }
-      }, "*");
+      }, window.location.origin);
     } catch (e) { console.error("Bridge failed:", e); }
 
     console.log("🎨 Rendering App...");
