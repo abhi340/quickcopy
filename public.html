@@ -60,16 +60,27 @@
 
     function renderSnippet(text) {
       document.getElementById('app').innerHTML = `
-        <div class="header">
-          <h1 style="font-weight:900; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">QuickCopy Share</h1>
-        </div>
-        <div class="glass-card">
-          <div class="snippet-content" style="font-size: 1.2rem; min-height: 100px;">${escapeHtml(text)}</div>
-          <button class="btn btn-primary" id="copy-btn">Copy to Clipboard</button>
-          <p style="text-align:center; margin-top:20px; font-size:0.8rem; color:var(--text-dim);">shared via QuickCopy Pro</p>
-        </div>
-        <div style="text-align:center; margin-top:24px;">
-           <button class="btn btn-outline" onclick="window.location.href='index.html'">Create Your Own Account</button>
+        <div class="content-container" style="margin-top: 40px;">
+          <div class="aux-header">
+            <div class="aux-header-top">
+               <div class="brand-label">QUICKCOPY PRO</div>
+               <div style="opacity: 0.5;">Shared Snippet</div>
+            </div>
+            <h1 class="aux-header-title" style="background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">QuickCopy Share</h1>
+          </div>
+          
+          <div class="glass-card">
+            <div class="snippet-content" style="font-size: 1.2rem; min-height: 100px; margin-bottom: 24px;">${escapeHtml(text)}</div>
+            <div style="display: flex; justify-content: center; gap: 16px;">
+              <button class="btn btn-primary" id="copy-btn" style="width: auto; padding: 12px 32px;">Copy to Clipboard</button>
+            </div>
+            <p style="text-align:center; margin-top:20px; font-size:0.8rem; color:var(--text-dim); font-weight: 600;">securely shared via QuickCopy Pro</p>
+          </div>
+          
+          <div style="text-align:center; margin-top:40px;">
+             <p style="margin-bottom: 16px; font-size: 0.9rem; color: var(--text-dim);">Want your own secure cloud clipboard?</p>
+             <button class="btn btn-outline" onclick="window.location.href='index.html'" style="margin: 0 auto;">Join QuickCopy Pro</button>
+          </div>
         </div>
       `;
 

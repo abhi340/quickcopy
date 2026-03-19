@@ -11,22 +11,23 @@ QuickCopy Pro is a <strong>high-performance, secure, and visually stunning cloud
 
 ---
 
-## ✨ Why QuickCopy Pro?
+## 🌐 The QuickCopy Ecosystem
 
-QuickCopy isn't just a list of texts; it's a <strong>professional-grade digital companion</strong> designed for developers, writers, and power users who need their data to follow them.
+We've evolved from a simple web app into a fully integrated productivity ecosystem.
 
-### 🌟 Premium Features
-- <strong>📱 PWA Support:</strong> Install QuickCopy on your desktop or mobile for a native app experience with offline support.
-- <strong>🧱 Masonry Layout:</strong> A beautiful Pinterest-style flow that optimizes vertical space (3 columns on PC, 1 on Mobile).
-- <strong>🔗 Public Sharing:</strong> Generate unique, view-only links for any snippet to share with colleagues or friends.
-- <strong>✍️ Markdown Rendering:</strong> Toggle <strong>M↓</strong> to render beautiful formatted notes, lists, and code blocks.
-- <strong>📊 Productivity Analytics:</strong> Visual stats on your clip usage and storage health.
-- <strong>⚡ Power-User Shortcuts:</strong>
-  - `Ctrl + Enter`: Instant Save
-  - `j / k`: Vim-style navigation
-  - `y`: Instant Copy selected clip
-  - `/`: Focus Search
-  - `Esc`: Clear search/modals
+### 🧩 Browser Extension V2 (Chrome, Firefox, Edge)
+The "Heart" of the Pro experience. Save anything from around the web without ever leaving your tab.
+- **🚀 Right-Click Sync:** Highlight any text or link, right-click, and "Save to QuickCopy" instantly.
+- **🔍 Global Search Popup:** Find and copy your cloud snippets directly from the browser toolbar.
+- **🖱️ Premium Reordering:** Intuitive Drag-and-Drop management synced globally via a custom `priority` engine.
+- **🔐 Native Auth:** Direct Google Sign-In within the extension using specialized Web Auth Flows.
+
+### 💻 Web Dashboard
+Your command center for deep snippet management and analytics.
+- **⚡ Real-Time Sync:** Upgraded to Firestore `onSnapshot` listeners for zero-latency cross-device updates.
+- **📱 PWA Support:** Native app experience on Mobile and Desktop with offline capabilities.
+- **🧱 Masonry Layout:** Intelligent visual grid that optimizes vertical space.
+- **✍️ Markdown Rendering:** Toggle **M↓** for beautiful code blocks and formatted notes.
 
 ---
 
@@ -34,40 +35,24 @@ QuickCopy isn't just a list of texts; it's a <strong>professional-grade digital 
 
 QuickCopy Pro is a testament to the power of <strong>human-driven AI pair programming</strong>. This project was built through an intensive, high-velocity collaboration between **Abhiram (Lead Developer)** and **Gemini (AI Engineer)**.
 
-### How we built this:
-1.  **Ideation & Architecture:** Abhiram defined the vision for a "Digital Second Brain," while Gemini architected the robust Design System v5.0.
-2.  **Iterative Refinement:** Every UI pixel—from the multi-line dynamic input box to the grid-based mobile header—was refined through dozens of real-time feedback loops.
-3.  **Deployment:** Leveraging **Cloudflare Pages** for lightning-fast global edge hosting and **Firebase** for low-latency real-time synchronization.
-4.  **Security First:** We jointly implemented strict Regex validations, Zero-Trust authentication flows, and E2E hardening.
+### How we solved the hard problems:
+1.  **The Auth Bridge:** To solve cross-browser OAuth2 restrictions, we architected a custom "Direct Sync Bridge" using `postMessage` and `chrome.storage.onChanged` to relay sessions between the website and the extension securely.
+2.  **Global Ranking:** Instead of simple date sorting, we implemented a `doubleValue` priority system, allowing users to perform infinite drag-and-drop reordering without database collisions.
+3.  **Cross-Browser Packaging:** We developed a specialized PowerShell pipeline that dynamically generates browser-specific `manifest.json` files for Chromium and Firefox, handling specific security headers and background script variations automatically.
 
 ---
 
 ## 🚀 Deployment & Tech Stack
 
 ### Infrastructure
-- **Hosting:** [Cloudflare Pages](https://pages.cloudflare.com/) — Global CDN delivery with automatic CI/CD.
-- **Database:** [Firebase Firestore](https://firebase.google.com/) — Real-time NoSQL data synchronization.
-- **Auth:** [Firebase Authentication](https://firebase.google.com/) — Secure Google and Email/Password flows.
+- **Hosting:** [Cloudflare Workers/Pages](https://pages.cloudflare.com/) — Global CDN delivery with edge performance.
+- **Database:** [Firebase Firestore](https://firebase.google.com/) — Real-time NoSQL synchronization.
+- **Auth:** [Firebase Authentication](https://firebase.google.com/) — Multi-platform secure identity provider.
 
 ### Core Tech
 - **Frontend:** Vanilla JavaScript (ES Modules), HTML5, CSS3 (Glassmorphism).
-- **Security:** [DOMPurify](https://github.com/cure53/dompurify) for sanitization.
-- **Rendering:** [Marked.js](https://marked.js.org/) for high-speed Markdown parsing.
-
----
-
-## 🚀 Getting Started
-
-1.  **Clone:** `git clone https://github.com/abhi340/quickcopy.git`
-2.  **Configure:** Copy `firebase-config.example.js` to `firebase-config.js` and add your keys.
-3.  **Deploy:** Connect your repository to **Cloudflare Pages** for instant deployment.
-
----
-
-## 🙌 Support the Vision
-If QuickCopy Pro has helped your workflow, consider supporting the journey!
-- **International:** [Buy Me a Coffee](https://www.buymeacoffee.com/abhiram)
-- **India:** Pay via UPI (**abhiramkodicherla-1@oksbi**)
+- **Security:** Strict [DOMPurify](https://github.com/cure53/dompurify) sanitization and Zero-Trust architecture.
+- **Packaging:** Native .NET `ZipArchive` normalization for cross-store compatibility.
 
 ---
 
@@ -77,4 +62,4 @@ If QuickCopy Pro has helped your workflow, consider supporting the journey!
 
 ---
 
-👉 **[Launch QuickCopy Pro Live](https://quickcopy.pages.dev/)**
+👉 **[Launch QuickCopy Pro Live](https://quickcopy.abhicm019.workers.dev/)**

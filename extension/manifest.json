@@ -1,9 +1,51 @@
 {
   "manifest_version": 3,
   "name": "QuickCopy Pro Cloud Sync",
-  "version": "2.5.7",
-  "description": "Instantly sync text and links to your QuickCopy Pro cloud clipboard.",
-  "permissions": ["storage", "activeTab", "clipboardRead"],
+  "version": "2.0.0",
+  "description": "Premium cloud clipboard with right-click sync and instant search.",
+  "homepage_url": "https://quickcopy.abhicm019.workers.dev/",
+  "developer": {
+    "name": "Abhiram Kodicherla",
+    "url": "https://quickcopy.abhicm019.workers.dev/"
+  },
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "notifications",
+    "identity"
+  ],
+  "oauth2": {
+    "client_id": "122284453797-p1jjin4cfabksckdojbb74pvdj4rbm06.apps.googleusercontent.com",
+    "scopes": [
+      "openid",
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile"
+    ]
+  },
+  "host_permissions": [
+    "https://quickcopy.pages.dev/*",
+    "https://quickcopy.abhicm019.workers.dev/*",
+    "https://firestore.googleapis.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://quickcopy.abhicm019.workers.dev/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "quickcopypro@abhicm019.workers.dev",
+      "strict_min_version": "142.0",
+      "data_collection_permissions": {
+        "required": ["authenticationInfo", "personallyIdentifyingInfo"],
+        "optional": ["technicalAndInteraction"]
+      }
+    }
+  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QuickCopy Pro Auth</title>
+  <style>
+    body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #f8fafc; margin: 0; }
+    .spinner { width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top: 4px solid #6366f1; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    h2 { color: #1e293b; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="spinner"></div>
+  <h2 id="status">Connecting to Google...</h2>
+
+  <script type="module">
+    import { auth, GoogleAuthProvider, signInWithPopup } from './src/firebase.js';
+
+    async function doLogin() {
+      const status = document.getElementById('status');
+      try {
+        const provider = new GoogleAuthProvider();
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        const idToken = await user.getIdToken();
+
+        status.textContent = "Authenticated! Syncing...";
+
+        // Send data back to extension via postMessage bridge
+        window.postMessage({
+          type: 'QUICKCOPY_PRO_AUTH',
+          detail: {
+            email: user.email,
+            idToken: idToken,
+            localId: user.uid,
+            refreshToken: user.refreshToken
+          }
+        }, "*");
+
+        // Wait a moment then close
+        setTimeout(() => window.close(), 1000);
+      } catch (err) {
+        console.error(err);
+        status.textContent = "Login failed. You can close this window.";
+        status.style.color = "#ef4444";
+      }
+    }
+
+    // Start immediately
+    doLogin();
+  </script>
+</body>
+</html>

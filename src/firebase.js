@@ -20,6 +20,7 @@ import {
   addDoc,
   getDocs,
   getDoc,
+  onSnapshot,
   query,
   where,
   updateDoc,
@@ -44,5 +45,5 @@ export {
   auth, db,
   signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged,
   GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail, sendEmailVerification, deleteUser, updateEmail,
-  collection, addDoc, getDocs, getDoc, query, where, updateDoc, deleteDoc, doc
+  collection, addDoc, getDocs, getDoc, onSnapshot, query, where, updateDoc, deleteDoc, doc
 };

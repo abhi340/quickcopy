@@ -165,6 +165,15 @@ function renderLogin(force = false) {
         </div>
       </div>
     </div>
+    <footer class="app-footer">
+      <div class="footer-links">
+        <a href="about.html">About</a>
+        <a href="features.html">Features</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="changelog.html">Changelog</a>
+      </div>
+      <p>&copy; 2026 QuickCopy Pro. All rights reserved.</p>
+    </footer>
   `;
 
   document.getElementById('login-btn').onclick = async () => {
@@ -245,6 +254,15 @@ function renderSignup() {
         <div id="signup-error" class="auth-error-msg" style="display:none;"></div>
       </div>
     </div>
+    <footer class="app-footer">
+      <div class="footer-links">
+        <a href="about.html">About</a>
+        <a href="features.html">Features</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="changelog.html">Changelog</a>
+      </div>
+      <p>&copy; 2026 QuickCopy Pro. All rights reserved.</p>
+    </footer>
   `;
   document.getElementById('signup-btn').onclick = async () => {
     const name = document.getElementById('signup-name').value.trim();
@@ -327,8 +345,8 @@ function renderApp() {
     <div id="snippets-list-container"></div>
 
     <footer class="app-footer">
-      <div style="display: flex; flex-direction: column; align-items: center; gap: 24px; margin-bottom: 32px;">
-        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: center;">
+      <div class="footer-cta">
+        <div class="footer-btns">
           <button id="generate-joke-btn" class="btn btn-primary" style="box-shadow: none; height: 40px; padding: 0 16px; font-size: 0.85rem; background: #f59e0b;">
             <span style="font-size: 1.1rem; margin-right: 8px;">🎁</span> Donate
           </button>
@@ -614,15 +632,30 @@ async function editSnippet(id, old) {
   if (res && res.trim()) { await updateDoc(doc(db, 'snippets', id), { text: res.trim() }); showToast('Updated!'); loadSnippets(); }
 }
 
+let unsubscribeSnippets = null;
+
 async function loadSnippets() {
   if (!currentUser) return;
+  if (unsubscribeSnippets) unsubscribeSnippets();
+
+  console.log("📡 Subscribing to real-time snippets...");
   try {
     const q = query(collection(db, 'snippets'), where('userId', '==', currentUser.uid));
-    const snap = await getDocs(q);
-    snippets = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    snippets.sort((a, b) => a.pinned === b.pinned ? new Date(b.createdAt) - new Date(a.createdAt) : (a.pinned ? -1 : 1));
-    renderSnippets();
-  } catch (e) {}
+    unsubscribeSnippets = onSnapshot(q, (snap) => {
+      snippets = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      snippets.sort((a, b) => {
+        const pA = a.priority || 0;
+        const pB = b.priority || 0;
+        if (pB !== pA) return pB - pA;
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+      renderSnippets();
+    }, (err) => {
+      console.error("🔥 Firestore Subscription Error:", err);
+    });
+  } catch (e) {
+    console.error("🔥 Load failed:", e);
+  }
 }
 
 function confirmDeleteAccount() {
@@ -650,7 +683,56 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ===== INITIALIZATION =====
-onAuthStateChanged(auth, (u) => { 
-  if (u) { currentUser = u; renderApp(); loadSnippets(); } 
-  else { currentUser = null; currentActivePage = ''; renderLogin(); } 
+console.log("📡 Setting up Auth Listener...");
+onAuthStateChanged(auth, async (u) => { 
+  console.log("🔐 Auth State Changed:", u ? "User Logged In" : "No User");
+  if (u) { 
+    currentUser = u; 
+    
+    // EXTENSION BRIDGE: Send auth data to extension if present
+    try {
+      const idToken = await u.getIdToken();
+      window.postMessage({
+        type: 'QUICKCOPY_PRO_AUTH',
+        detail: {
+          email: u.email,
+          idToken: idToken,
+          localId: u.uid,
+          refreshToken: u.refreshToken
+        }
+      }, "*");
+    } catch (e) { console.error("Bridge failed:", e); }
+
+    console.log("🎨 Rendering App...");
+    
+    // Check if we are in Bridge Mode
+    if (window.location.search.includes('ext_login=')) {
+      clearApp();
+      const isGoogle = window.location.search.includes('ext_login=google');
+      
+      document.getElementById('app').innerHTML = `
+        <div style="height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:40px; animation: fadeIn 0.4s ease-out;">
+          <div class="spinner" style="width:60px; height:60px; margin-bottom:24px;"></div>
+          <h2 style="color:var(--primary); font-weight:800; margin-bottom:8px;">${isGoogle ? 'Redirecting to Google...' : 'Linking Extension...'}</h2>
+          <p style="opacity:0.7; font-size:0.9rem;">Authenticating your QuickCopy Pro session. This window will close automatically.</p>
+        </div>
+      `;
+
+      if (isGoogle && !u) {
+        const provider = new GoogleAuthProvider();
+        signInWithPopup(auth, provider).catch(e => console.error("Google Popup Failed:", e));
+      }
+      return; 
+    }
+
+    renderApp(); 
+    console.log("📥 Loading Snippets...");
+    loadSnippets(); 
+  } 
+  else { 
+    currentUser = null; 
+    currentActivePage = ''; 
+    console.log("👋 Rendering Login...");
+    renderLogin(); 
+  } 
 });

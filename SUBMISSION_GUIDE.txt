@@ -1,0 +1,32 @@
+QUICKCOPY PRO - FIREFOX SUBMISSION GUIDE
+========================================
+
+--- 1. DESCRIPTION ---
+QuickCopy Pro is your digital second brain. Seamlessly synchronize text, links, and code snippets across all your devices with a stunning Glassmorphism interface. 
+
+Key Features:
+- Instant Sync: Right-click any text or link to save it to your cloud instantly.
+- Global Search: Find and copy any saved snippet directly from the extension toolbar without switching tabs.
+- Drag-and-Drop: Intuitive manual reordering to organize your clips exactly how you want them.
+- Premium Security: Secure Google Sign-In and private Firebase storage ensure your data belongs only to you.
+- Developer Friendly: Perfect for managing code snippets, terminal commands, and research links.
+
+Works perfectly with our web dashboard at https://quickcopy.abhicm019.workers.dev/ for a unified cross-platform experience.
+
+--- 2. SUPPORT EMAIL ---
+abhicm019@gmail.com
+
+--- 3. SUPPORT WEBSITE ---
+https://quickcopy.abhicm019.workers.dev/
+
+--- 4. PRIVACY POLICY URL ---
+https://quickcopy.abhicm019.workers.dev/privacy.html
+
+--- 5. NOTES TO REVIEWER ---
+This extension is a cloud-synced clipboard manager. 
+
+Testing Instructions:
+1. The extension requires authentication to store and sync snippets. 
+2. Reviewers can use the "Create Account" link to sign up via our website (https://quickcopy.abhicm019.workers.dev/) or use the Google Sign-In option. 
+3. The extension uses the launchWebAuthFlow API for secure authentication. 
+4. Once logged in, snippets can be added via the "Sync to Cloud" textarea or by right-clicking text on any webpage.
