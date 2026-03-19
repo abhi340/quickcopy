@@ -1,4 +1,4 @@
-import { auth, db, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail, deleteUser, collection, addDoc, getDocs, query, where, updateDoc, deleteDoc, doc } from './firebase.js';
+import { auth, db, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail, deleteUser, collection, addDoc, getDocs, onSnapshot, query, where, updateDoc, deleteDoc, doc } from './firebase.js';
 import { ICONS } from './icons.js';
 import { palettes, applyPalette, toggleTheme } from './theme.js';
 import { showToast, escapeHtml, showError, getFriendlyAuthError, getSnippetType, showJokeModal } from './utils.js';
@@ -298,7 +298,10 @@ function renderApp() {
 
   document.getElementById('app').innerHTML = `
     <div class="header" style="animation: fadeIn 0.3s ease-out;">
-      <div class="user-greeting">Hello, <span id="header-user-name">${safeDisplayName}</span></div>
+      <div style="display:flex; flex-direction:column;">
+        <div class="user-greeting">Hello, <span id="header-user-name">${safeDisplayName}</span></div>
+        <div style="font-size:0.6rem; opacity:0.5;">${currentUser.email} | ID: ${currentUser.uid.substring(0,8)}...</div>
+      </div>
       <div class="header-search-container">
         ${ICONS.search}
         <input type="text" id="search-input" placeholder="Search clips..." value="${safeSearchTerm}" />
@@ -463,16 +466,18 @@ function renderSnippets() {
   if (vArchived) vArchived.classList.toggle('active', currentView === 'archived');
   if (vTrash) vTrash.classList.toggle('active', currentView === 'trash');
 
+  // Filter logic with type safety
   filteredSnippets = snippets.filter(s => {
+    if (!s || !s.text) return false;
     const matchesSearch = s.text.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = (s.status || 'active') === currentView;
-    const matchesTag = currentTag === 'all' || (s.tags && s.tags.includes(currentTag));
+    const matchesTag = currentTag === 'all' || (s.tags && Array.isArray(s.tags) && s.tags.includes(currentTag));
     return matchesSearch && matchesStatus && matchesTag;
   });
 
   const allTags = new Set();
   snippets.filter(s => (s.status || 'active') === currentView).forEach(s => {
-    if (s.tags) s.tags.forEach(t => allTags.add(t));
+    if (s.tags && Array.isArray(s.tags)) s.tags.forEach(t => allTags.add(t));
   });
   
   const tagsContainer = document.getElementById('tag-filters-container');
@@ -492,15 +497,24 @@ function renderSnippets() {
     }
   }
 
+  const totalCount = snippets.length;
+
   container.innerHTML = `
     <div id="snippets-list">
       ${filteredSnippets.length === 0 
-        ? `<div class="glass-card empty-state" style="text-align:center; color:var(--text-dim);">No clips found.</div>` 
+        ? `<div class="glass-card empty-state" style="text-align:center; color:var(--text-dim); padding: 40px;">
+             <p>No clips found in <strong>${currentView}</strong>.</p>
+             ${totalCount > 0 ? `<p style="font-size:0.8rem; color:var(--primary); margin-top:10px;">💡 You have ${totalCount} clips total. Check Archived or Trash?</p>` : ''}
+             <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--glass-border); font-size:0.65rem; opacity:0.4;">
+               Logged in as: ${currentUser.email}<br>
+               UID: ${currentUser.uid}
+             </div>
+           </div>` 
         : filteredSnippets.map((item, i) => {
             const type = getSnippetType(item.text);
             const isTrash = item.status === 'trash';
             const isArchived = item.status === 'archived';
-            const isMarkdown = item.isMarkdown || false;
+            const isMarkdown = item.isMarkdown && window.marked && window.DOMPurify;
 
             let contentHtml = highlightSearch(escapeHtml(item.text), searchTerm);
             let richMediaHtml = '';
@@ -520,12 +534,18 @@ function renderSnippets() {
               } catch(e) {}
             }
 
-            if (isMarkdown && window.marked && window.DOMPurify) {
+            // MANDATORY SANITIZATION FOR MARKDOWN
+            if (isMarkdown) {
               try {
                 const rawHtml = marked.parse(item.text);
-                contentHtml = `<div class="markdown-body">${DOMPurify.sanitize(rawHtml)}</div>`;
-                if (searchTerm && searchTerm.length >= 2) contentHtml = highlightSearch(contentHtml, searchTerm);
-              } catch (e) {}
+                const cleanHtml = DOMPurify.sanitize(rawHtml, {
+                  ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'code', 'pre', 'a', 'p', 'br', 'ul', 'ol', 'li', 'h1', 'h2', 'h3'],
+                  ALLOWED_ATTR: ['href', 'target', 'class']
+                });
+                contentHtml = `<div class="markdown-body">${cleanHtml}</div>`;
+              } catch (e) {
+                contentHtml = `<div class="code-block">${escapeHtml(item.text)}</div>`;
+              }
             } else if (type === 'code') {
               contentHtml = `<div class="code-block">${contentHtml}</div>`;
             }
@@ -539,7 +559,7 @@ function renderSnippets() {
                   </div>
                   <div style="display: flex; gap: 4px;">
                     ${item.isPublic ? '<span class="badge badge-link" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">Public</span>' : ''}
-                    ${isMarkdown ? '<span class="badge badge-code" style="background: rgba(99, 102, 241, 0.15); color: #818cf8;">MD</span>' : ''}
+                    ${item.isMarkdown ? '<span class="badge badge-code" style="background: rgba(99, 102, 241, 0.15); color: #818cf8;">MD</span>' : ''}
                   </div>
                 </div>
                 <div class="snippet-content">${richMediaHtml}${contentHtml}</div>
@@ -548,7 +568,7 @@ function renderSnippets() {
                     ${!isTrash ? `
                       <button class="icon-btn pin-btn ${item.pinned ? 'active' : ''}" data-id="${item.id}" data-pinned="${item.pinned}" title="Pin">${ICONS.pin}</button>
                       <button class="icon-btn share-btn" data-id="${item.id}" data-public="${item.isPublic || false}" title="Share">${ICONS.share}</button>
-                      <button class="icon-btn md-btn ${isMarkdown ? 'active' : ''}" data-id="${item.id}" data-md="${isMarkdown}" title="Markdown">${ICONS.markdown}</button>
+                      <button class="icon-btn md-btn ${item.isMarkdown ? 'active' : ''}" data-id="${item.id}" data-md="${item.isMarkdown}" title="Markdown">${ICONS.markdown}</button>
                       <button class="icon-btn edit-btn" data-id="${item.id}" data-text="${escapeHtml(item.text)}" title="Edit">${ICONS.edit}</button>
                       <button class="icon-btn archive-btn" data-id="${item.id}" data-status="${item.status || 'active'}" title="${isArchived ? 'Unarchive' : 'Archive'}">${ICONS.archive}</button>
                     ` : ''}
@@ -638,20 +658,29 @@ async function loadSnippets() {
   if (!currentUser) return;
   if (unsubscribeSnippets) unsubscribeSnippets();
 
-  console.log("📡 Subscribing to real-time snippets...");
+  const container = document.getElementById('snippets-list-container');
+  if (container) container.innerHTML = '<div style="text-align:center; padding:40px;"><div class="spinner" style="margin:0 auto;"></div><p style="margin-top:10px; opacity:0.5;">Connecting to Cloud...</p></div>';
+
+  console.log("📡 Subscribing to Cloud for UID:", currentUser.uid);
   try {
     const q = query(collection(db, 'snippets'), where('userId', '==', currentUser.uid));
     unsubscribeSnippets = onSnapshot(q, (snap) => {
+      console.log(`📦 Cloud Snapshot: ${snap.size} snippets found.`);
       snippets = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      
+      // Resilient sorting
       snippets.sort((a, b) => {
         const pA = a.priority || 0;
         const pB = b.priority || 0;
         if (pB !== pA) return pB - pA;
-        return new Date(b.createdAt) - new Date(a.createdAt);
+        const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+        const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+        return dateB - dateA;
       });
       renderSnippets();
     }, (err) => {
-      console.error("🔥 Firestore Subscription Error:", err);
+      console.error("🔥 Sync Error:", err);
+      if (container) container.innerHTML = `<div class="glass-card" style="color:#ef4444; text-align:center; padding:20px;"><h3>Sync Blocked</h3><p>${err.message}</p></div>`;
     });
   } catch (e) {
     console.error("🔥 Load failed:", e);

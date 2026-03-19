@@ -131,7 +131,7 @@ body { background: var(--bg-gradient); background-attachment: fixed; color: var(
 .stat-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--glass-border); font-size: 0.95rem; }
 
 /* ===== Buttons & Badges ===== */
-.btn { padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem; }
+.btn { padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem; text-decoration: none !important; }
 .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 15px var(--primary-glow); }
 .btn-outline { background: transparent; border: 1px solid var(--glass-border); color: var(--text); }
 .btn-outline.active { background: var(--primary); color: white; border-color: var(--primary); }

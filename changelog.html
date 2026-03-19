@@ -21,6 +21,20 @@
             <h1 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 20px; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Evolution of QuickCopy Pro</h1>
             <p style="margin-bottom: 20px;">Tracking our journey from a simple clipboard to a professional ecosystem.</p>
 
+            <!-- Release v2.5.9 -->
+            <div class="glass-card stats-card" style="margin-top: 32px; border-left: 5px solid var(--accent);">
+                <div class="card-title" style="color: var(--accent);">v2.5.9 — The Security & Hardening Update</div>
+                <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 12px;">Released March 19, 2026</p>
+                <ul style="margin-left: 20px; font-size: 0.95rem;">
+                    <li><strong>Architectural Audit:</strong> Performed a comprehensive security review and hardened the core snippet sync engine.</li>
+                    <li><strong>Anti-XSS Engine:</strong> Implemented mandatory <code>DOMPurify</code> sanitization after Markdown parsing to prevent persistent injection attacks.</li>
+                    <li><strong>Data Integrity:</strong> Introduced a strict 15,000-character limit per snippet to ensure database performance and prevent DoS.</li>
+                    <li><strong>Bulletproof Sorting:</strong> Rewrote the ranking logic to gracefully handle missing timestamps or malformed metadata.</li>
+                    <li><strong>Account Transparency:</strong> Added visible UID tracking in the dashboard to ensure seamless synchronization between web and extension.</li>
+                    <li><strong>UI Polish:</strong> Standardized button decorations and removed unnecessary underlines for a cleaner, modern look.</li>
+                </ul>
+            </div>
+
             <!-- Release v2.5.8 -->
             <div class="glass-card stats-card" style="margin-top: 32px; border-left: 5px solid var(--primary);">
                 <div class="card-title" style="color: var(--primary);">v2.5.8 — The Unified Ecosystem Update</div>
