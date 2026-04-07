@@ -5,6 +5,7 @@ dist/
 .env
 .gemini/
 firebase-config.js
+secrets/
 
 # wrangler files
 .wrangler
