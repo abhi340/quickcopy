@@ -588,6 +588,13 @@ function renderSnippets() {
       if (e.target.closest('.icon-btn')) return;
       const idx = card.dataset.index;
       navigator.clipboard.writeText(filteredSnippets[idx].text);
+      
+      // Visual feedback: brief scale-down effect
+      card.style.transform = 'scale(0.98)';
+      setTimeout(() => {
+        card.style.transform = '';
+      }, 100);
+      
       showToast('Copied! 📋');
     };
   });

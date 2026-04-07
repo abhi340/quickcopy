@@ -5,8 +5,8 @@ export function showToast(message, icon = '✅') {
   toast.innerHTML = `<span>${icon}</span> ${message}`;
   container.appendChild(toast);
   setTimeout(() => {
-    toast.style.opacity = '0';
-    setTimeout(() => toast.remove(), 300);
+    toast.classList.add('exit');
+    setTimeout(() => toast.remove(), 400);
   }, 3000);
 }
 
