@@ -100,9 +100,18 @@ document.addEventListener('click', (e) => {
   const target = e.target.closest('button, .btn-link');
   if (!target) return;
   
-  if (target.id === 'show-signup-btn') { e.preventDefault(); renderSignup(); }
-  if (target.id === 'forgot-password-btn') { e.preventDefault(); showForgotPasswordModal(); }
-  if (target.id === 'back-to-login' || target.id === 'back-to-login-signup') { e.preventDefault(); renderLogin(true); }
+  if (target.id === 'show-signup-btn') { 
+    e.preventDefault(); 
+    renderPortalTransition(() => renderSignup()); 
+  }
+  if (target.id === 'forgot-password-btn') { 
+    e.preventDefault(); 
+    renderPortalTransition(() => showForgotPasswordModal()); 
+  }
+  if (target.id === 'back-to-login' || target.id === 'back-to-login-signup') { 
+    e.preventDefault(); 
+    renderPortalTransition(() => renderLogin(true)); 
+  }
 });
 
 // ===== AUTH RENDERERS =====
@@ -720,6 +729,54 @@ document.addEventListener('keydown', (e) => {
 
 // ===== INITIALIZATION =====
 console.log("📡 Setting up Auth Listener...");
+
+function getHumorousLoadingMessage() {
+  const messages = [
+    "Reticulating splines...",
+    "Checking your credentials with the office cat 🐈",
+    "Downloading more RAM...",
+    "Entering the data stream...",
+    "Syncing with the mothership... 👽",
+    "Polishing the glassmorphism... ✨",
+    "Brewing digital coffee... ☕",
+    "Bypassing the mainframe... 💾",
+    "Calibrating the second brain... 🧠",
+    "Assembling the bits and bytes... 🛠️"
+  ];
+  return messages[Math.floor(Math.random() * messages.length)];
+}
+
+function renderPortalTransition(callback) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.style.flexDirection = 'column';
+  overlay.style.gap = '24px';
+  overlay.style.zIndex = '10001';
+  
+  const spinner = document.createElement('div');
+  spinner.className = 'spinner';
+  spinner.style.width = '80px';
+  spinner.style.height = '80px';
+  spinner.style.borderWidth = '4px';
+  
+  const msg = document.createElement('div');
+  msg.style.fontWeight = '700';
+  msg.style.fontSize = '1.1rem';
+  msg.style.color = 'var(--text)';
+  msg.style.textAlign = 'center';
+  msg.textContent = getHumorousLoadingMessage();
+  
+  overlay.appendChild(spinner);
+  overlay.appendChild(msg);
+  document.body.appendChild(overlay);
+  
+  setTimeout(() => {
+    callback();
+    overlay.classList.add('fade-out');
+    setTimeout(() => overlay.remove(), 400);
+  }, 1200);
+}
+
 onAuthStateChanged(auth, async (u) => { 
   console.log("🔐 Auth State Changed:", u ? "User Logged In" : "No User");
   if (u) { 
@@ -761,14 +818,31 @@ onAuthStateChanged(auth, async (u) => {
       return; 
     }
 
-    renderApp(); 
-    console.log("📥 Loading Snippets...");
-    loadSnippets(); 
+    if (currentActivePage !== 'dashboard') {
+      renderPortalTransition(() => {
+        renderApp(); 
+        console.log("📥 Loading Snippets...");
+        loadSnippets(); 
+      });
+    } else {
+      renderApp();
+      loadSnippets();
+    }
   } 
   else { 
+    const wasLoggedIn = !!currentUser;
     currentUser = null; 
-    currentActivePage = ''; 
-    console.log("👋 Rendering Login...");
-    renderLogin(); 
+    
+    if (wasLoggedIn && currentActivePage !== 'login') {
+      renderPortalTransition(() => {
+        currentActivePage = ''; 
+        console.log("👋 Rendering Login...");
+        renderLogin(); 
+      });
+    } else {
+      currentActivePage = ''; 
+      console.log("👋 Rendering Login...");
+      renderLogin(); 
+    }
   } 
 });
