@@ -17,6 +17,29 @@
   <script type="module">
     import { auth, GoogleAuthProvider, signInWithPopup } from './src/firebase.js';
 
+    function getTargetOrigin() {
+      // Prefer the origin of the window that opened this one, if available
+      try {
+        if (window.opener && window.opener.location && window.opener.location.origin) {
+          return window.opener.location.origin;
+        }
+      } catch (e) {
+        // Accessing window.opener.location may throw if cross-origin; ignore and fall back
+      }
+
+      // If embedded, fall back to the parent window's origin when accessible
+      try {
+        if (window.parent && window.parent !== window && window.parent.location && window.parent.location.origin) {
+          return window.parent.location.origin;
+        }
+      } catch (e) {
+        // Accessing window.parent.location may throw if cross-origin; ignore and fall back
+      }
+
+      // Final fallback: restrict to this page's own origin
+      return window.location.origin;
+    }
+
     async function doLogin() {
       const status = document.getElementById('status');
       try {
@@ -36,7 +59,7 @@
             localId: user.uid,
             refreshToken: user.refreshToken
           }
-        }, "*");
+        }, getTargetOrigin());
 
         // Wait a moment then close
         setTimeout(() => window.close(), 1000);
